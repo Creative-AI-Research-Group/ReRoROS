@@ -6,7 +6,6 @@ L VEL
 R VEL
 THPOS
 Battery
-Compass
 """
 
 import serial
