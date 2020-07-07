@@ -5,7 +5,7 @@ This is a basic operating system for a recycled robot based on the Pioneer serie
 
 The original onboard computer from the Pioneer machines were replaced with Jetson Nano's. These were connected to the Hitachi driver processors using a serial connection via the Jetson's USB.
 
-The operating system was wrote in Python as an expandable, easily modified system for basic motion and server reporting.
+The operating system was wrote in Python as an expandable, easily modified system for basic motion and server reporting from the internal ARIA system.
 
 ## Problem
 The Creative AI research group inherited a selection of old Pioneer robots as part of the Recycled Robot Orchestra project. The original Linux onboard computer and Pioneer operating system (P2OS) was not capable of supporting with the machine learning and AI programming at the heart of the Recycled Robot Orchestra.
