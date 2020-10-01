@@ -14,6 +14,7 @@ from threading import Thread
 from rerobot.rerobot import Robot
 from rerobot.comms import Comms
 import tkinter as tk
+import rerobot.config as config
 
 
 class LocalBot():
@@ -90,22 +91,20 @@ class GUI(tk.Frame):
         btn_quit.grid(row=2, column=2, sticky="nsew")
 
     def create_sips(self):
-        # TODO global variables not getting to this point !!!
-        global L_VEL, R_VEL, THPOS, BATTERY
 
-        label_battery = tk.Label(master=self, text=f"Battery Level = {BATTERY}")
+        label_battery = tk.Label(master=self, text=f"Battery Level = {config.BATTERY}")
         label_battery.grid(row=0, column=4)
 
         label_compass = tk.Label(master=self, text=f"Spare = 0")
         label_compass.grid(row=1, column=4)
 
-        label_heading = tk.Label(master=self, text=f"Actual Heading = {THPOS}")
+        label_heading = tk.Label(master=self, text=f"Actual Heading = {config.THPOS}")
         label_heading.grid(row=2, column=4)
 
-        label_left_wheel = tk.Label(master=self, text=f"Left Wheel Vel = {L_VEL}")
+        label_left_wheel = tk.Label(master=self, text=f"Left Wheel Vel = {config.L_VEL}")
         label_left_wheel.grid(row=3, column=4)
 
-        label_right_wheel = tk.Label(master=self, text=f"Right Wheel Vel = {R_VEL}")
+        label_right_wheel = tk.Label(master=self, text=f"Right Wheel Vel = {config.R_VEL}")
         label_right_wheel.grid(row=4, column=4)
 
     def update_sip(self):

@@ -9,13 +9,15 @@ Battery
 """
 
 import serial
+from rerobot import config
+
 
 class Comms():
-    L_VEL = 0
-    R_VEL = 0
-    THPOS = 0
-    BATTERY = 0
-    COMPASS = 0
+    # L_VEL = 0
+    # R_VEL = 0
+    # THPOS = 0
+    # BATTERY = 0
+    # COMPASS = 0
 
     def __init__(self):
         print(f'initialise connection to host\nopens up the serial port as an object called "ser"{id}')
@@ -56,10 +58,10 @@ class Comms():
         decode_array = list(msg)
         for i, bytes in enumerate(decode_array):
             if bytes[i] == 250 and bytes[i+1] == 251:
-                L_VEL = decode_array[i+9]
-                R_VEL = decode_array[i+10]
-                THPOS = decode_array[i+8]
-                BATTERY = decode_array[i+11]
+                config.L_VEL = decode_array[i + 9]
+                config.R_VEL = decode_array[i + 10]
+                config.THPOS = decode_array[i + 8]
+                config.BATTERY = decode_array[i + 11]
 
     def close_sequence(self, terminate_code):
         """closes down server
