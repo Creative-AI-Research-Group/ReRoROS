@@ -16,50 +16,18 @@ from rerobot.comms import Comms
 import tkinter as tk
 import rerobot.config as config
 
-
-class LocalBot():
-    """basic motion movement listed on GUI"""
-    
-    def __init__(self):
-        print ('local bot initialised')
-
-    def stop(self):
-        robot.stop()
-
-    def step_forward(self):
-        robot.move(10)
-        sleep(0.5)
-        robot.stop()
-
-    def step_backward(self):
-        robot.move(-10)
-        sleep(0.5)
-        robot.stop()
-
-    def step_left(self):
-        robot.rvel(20)
-        sleep(0.5)
-        robot.stop()
-
-    def step_right(self):
-        robot.rvel(-20)
-        sleep(0.5)
-        robot.stop()
-
-    def pulse(self):
-        global slow_loop
-        if slow_loop < 10:
-            slow_loop += 1
-        else:
-            sips_comms.pulse()  # send pulse code every cycle
-            print('sending pulse code')
-            slow_loop = 0
-
-
 class GUI(tk.Frame):
-    """ GUI """
+    """ GUI & main """
 
     def __init__(self, gui_window):
+        # 1. instantiates a comms link to SIPS and ReRobot
+        print('1. setting up comms to the robot')
+        self.sips_comms = Comms()
+        input("Is the robot ready?")  # temp fix until flag sorted
+
+        self.robot = Robot()
+        input("Is the robot ready?")  # temp fix until flag sorted
+
         """ Initialize the Frame"""
         tk.Frame.__init__(self, gui_window)
         self.grid()
@@ -124,6 +92,41 @@ class GUI(tk.Frame):
         # exit()
         running = False
 
+# local movement controls
+    def stop(self):
+        robot.stop()
+
+    def step_forward(self):
+        robot.move(10)
+        sleep(0.5)
+        robot.stop()
+
+    def step_backward(self):
+        robot.move(-10)
+        sleep(0.5)
+        robot.stop()
+
+    def step_left(self):
+        robot.rvel(20)
+        sleep(0.5)
+        robot.stop()
+
+    def step_right(self):
+        robot.rvel(-20)
+        sleep(0.5)
+        robot.stop()
+
+    def pulse(self):
+        global slow_loop
+        if slow_loop < 10:
+            slow_loop += 1
+        else:
+            sips_comms.pulse()  # send pulse code every cycle
+            print('sending pulse code')
+            slow_loop = 0
+
+
+
 """ 
 #######################################################
 ################      MAIN CODE        ################
@@ -131,15 +134,7 @@ class GUI(tk.Frame):
 """
 
 if __name__ == "__main__":
-    #1. instantiates a comms link to SIPS and ReRobot
-    print ('1. setting up comms to the robot')
-    sips_comms = Comms()
-    input("Is the robot ready?")  # temp fix until flag sorted
 
-    # todo while not ready_flag????:
-    l_bot = LocalBot()
-    robot = Robot()
-    input("Is the robot ready?") # temp fix until flag sorted
 
     # 2. initialise mission control & build GUI
     UPDATE_RATE = 100  # matches baud rate of Pioneer SIP sends e.g. every 100 ms
