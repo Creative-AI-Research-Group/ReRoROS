@@ -1,4 +1,4 @@
-# Recycled Robot Operating System v1.1.3
+# Recycled Robot Operating System v1.2.1
 ## Created by Craig Vear and Dmitriy Dubovitskiy
 
 This is a basic operating system for a recycled robot based on the Pioneer series of robots e.g. Pioneer 3 and Peoplebot.
