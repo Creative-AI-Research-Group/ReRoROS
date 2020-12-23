@@ -1,14 +1,8 @@
 """This class is a handler and interfaces between the GUI and the motor clasess.
 It translates all the basic commands into motor-class based code.
-Commands are:
-move - forward backward
-rvel - revolve
-head - goto compass bearing
-stop - stop
-left - move left wheel only
-right - move right wheel only"""
+"""
 
-from rerobot.motor import Motor
+from motor import Motor
 from time import sleep
 
 class Robot():

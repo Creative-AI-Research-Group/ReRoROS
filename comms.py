@@ -1,17 +1,14 @@
 """this class handles all comms with Hitatchi controller.
 It also parses the Server Information Packages from the robot
 and assigns relevent info to a variable.
-variables are:
-L VEL
-R VEL
-THPOS
-Battery
 """
 
 import serial
-import atexit
 
 class Comms:
+    # Full codes and info:
+    # https://www.manualslib.com/manual/130418/Pioneer-2-Peoplebot.html
+
     # define all major bytes
     HEADER1 = 250
     HEADER2 = 251
@@ -49,14 +46,16 @@ class Comms:
     VEL2 = 32
     GRIPPER = 33
     IOREQUEST = 40 # Request one (1), a continuous stream (>1), or stop (0) IO SIPs
+    BUMP_STALL = 44
     HOSTBAUD = 50
+    E_STOP = 55
 
     # complex codes
     CLOSE_DOWN_CODE = [HEADER1, HEADER2, SHORTCOUNT, SYNC2, 0, 2]
     HEARTBEAT = [HEADER1, HEADER2, SHORTCOUNT, SYNC0, 0, 0]
     STOP_COMMAND = [HEADER1, HEADER2, SHORTCOUNT, STOP, 00, 29]
 
-    # sipp reporting
+    # UI reporting variables from SIPPS
     L_VEL = 0
     R_VEL = 0
     THPOS = 0
@@ -75,30 +74,27 @@ class Comms:
             )
         self.ser.isOpen()
 
-    # header (2 bytes = \xFA\xFB),
-    #      byte count (1 byte),
-    #      command_num (1 byte 0-255),
-    #      arg_type (\x3B, \x1B or \x2B),
-    #      arg (n bytes - always 2-byte or string conatinig lgth prefix),
-    #      checksum (2 bytes))
+    # writes to server
     def write(self, msg):
         msg_hx = bytearray(msg)
         print(f'sending hex message: {msg_hx} to {self.ser.port}')
         self.ser.write(msg_hx)
 
+    # fluch buffer
     def flush(self):
         self.ser.flushInput()
 
+    # read from server buffer
     def read(self):
         incoming = self.ser.read(255)
         print (f'READING = {incoming}')
         self.flush()
         return incoming
 
+    # parse SIPPS codes
     def sip_read(self):
         read_data = self.read()
         print(f'return message is {read_data}')
-        # self.comms.flush()
 
         # parse sips
         decode_array = list(read_data)
@@ -107,7 +103,7 @@ class Comms:
 
                 # assign relevant bytes to robots vars
                 length_string = decode_array[i + 2]
-                self.TYPE = decode_array[i + 3] #  s = 2 when motors stopped or 3 when robot moving
+                self.TYPE = decode_array[i + 3]
                 self.XPOS = decode_array[i + 4: i + 5]
                 self.YPOS = decode_array[i + 6: i + 7]
                 self.THPOS = decode_array[i + 8: i + 9]
@@ -126,8 +122,7 @@ class Comms:
                 self.DIGOUT = decode_array[length_string - 6]
                 self.BATTERYX10 = decode_array[length_string - 5: length_string - 4]
 
-    # closes down server robot
-    # and serial port
+    # closes down server robot and serial port
     def close_sequence(self, terminate_code):
         terminate_code = bytearray(terminate_code)
         self.ser.write(terminate_code)
@@ -135,6 +130,7 @@ class Comms:
         self.ser.close()
         print("All closed - see ya!!")
 
+    # Heartbeat pulse
     def pulse(self):
         # writes a pulse (as raw Hex for now)
         # self.ser.write(b"\xFA\xFB\x03\x00\x00\x00")

@@ -55,7 +55,7 @@ class Motor(Comms):
         # \xFA\xFB\x06\x0A\x3B\x64\x00\x6E\x3B\
         # xFA\xFB\x06\x17\x3B\x64\x00\x7B\x3B\
         # xFA\xFB\x06\x17\x1B\x64\x00\x7B\x1B"
-        motor_codes = [self.HEADER1, self.HEADER2, self.BYTECOUNT, 62, self.POSITIVE, 1, 0, 63, 59,
+        motor_codes = [self.HEADER1, self.HEADER2, self.BYTECOUNT, 62, self.POSITIVE, 1, 0, 63, 59, # dont know code 62
                        self.HEADER1, self.HEADER2, self.BYTECOUNT, self.ENABLE, self.POSITIVE, 1, 0, 5, 59], \
                       [self.HEADER1, self.HEADER2, self.BYTECOUNT, self.SETV, self.POSITIVE, 244, 1, 250, 60,
                        self.HEADER1, self.HEADER2, self.BYTECOUNT, self.SETA, self.POSITIVE, 44, 1, 49, 60,
@@ -172,4 +172,5 @@ class Motor(Comms):
     def terminate(self):
         print ('Closing down all connections')
         # close_down_code = b"\xFA\xFB\x03\x02\x00\x02"
+        self.write(self.STOP_COMMAND)
         self.close_sequence(self.CLOSE_DOWN_CODE)
