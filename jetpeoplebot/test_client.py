@@ -1,13 +1,34 @@
 from test_server import Child1
 
 
+x = b'\xfb\xc1\x0f~\x00\x00\xd5\x00\xfa\xfb\x1b\xf0\x04\xc1\xc1\xc1\xfd\x01\x0f\x08\xef\x03\xce\x01\xe3\x01\xc6\x02\x15\x00\t\x00\x08\x02\x06\x02\x89a\xfa\xfb02\xf5\xff\x00\x00\x03\x00\x00\x00\x00\x00~\x00\x00\x00\x00\x0f\x00\x00\x06\x06\xd7\x00\x0e\x9e\x05\x16\xac\x01\x07%\x02\x0f\n\x04\x17\x88\x13"\x01\xfb\xc1\x0f~\x00\x00\xeb\x8f\xfa\xfb\x1b\xf0\x04\xc1\xc1\xc1\xfd\x01\x0f\x08\xee\x03\xcd\x01\xe3\x01\xc6\x02\x15\x00\t\x00\t\x02\x06\x02\x89`\xfa\xfb02\xf5\xff\x00\x00\x03\x00\x00\x00\x00\x00~\x00\x00\x00\x00\x0f\x00\x00\x06\x00\xf3\x03\x08_\x03\x10\x87\x07\x01a\x05\t\xad\x04\x11V\x02"\x01\xfb\xc1\x0f~\x00\x00\xae\x07\xfa\xfb\x1b\xf0\x04\xc1\xc1\xc1\xfd\x01\x0f\x08\xee\x03\xcd\x01\xe2\x01\xc6\x02\x15\x00\t\x00\t\x02\x06\x02\x89c\xfa\xfb92\xf5\xff\x00\x00\x03\x00\x00\x00\x00\x00~\x00\x00\x00\x00\x0f\x00\x00\t\x02<\x01\n\xe1\x03\x12\x96\x07\x03t\x02\x0b\xcd\x06\x139\t\x04\x8a\x05\x0c\xbf\x02\x14j\x05"\x01\xfb\xc1\x0f'
+
+decode_array = list(x)
 
 
-x = hex(b"\xFA")
-print(x)
+for i, bytes in enumerate(decode_array):
+    print(i, bytes)
+    if bytes == 250 and decode_array[i+1] == 251:
+        print('byte 2=', decode_array[i+1])
+        # assign relevant bytes to robots vars
+        length_string = decode_array[i + 2]
+        print('lenght string', length_string)
+        TYPE = decode_array[i + 3] #  s = 2 when motors stopped or 3 when robot moving
+        XPOS = decode_array[i + 4: i + 5]
+        YPOS = decode_array[i + 6: i + 6]
+        THPOS = decode_array[i + 8: i + 9]
+        L_VEL = decode_array[i + 10: i + 11]
+        R_VEL = decode_array[i + 12: i + 13]
+        BATTERY = decode_array[i + 14]
+        BUMPERS = decode_array[i + 15: i + 16]
+        CONTROL = decode_array[i + 17: i + 18]
+        FLAGS = decode_array[i + 19: i + 20]
+        COMPASS = decode_array[i + 21]
 
-y = int(x)
+        GRIP_STATE = decode_array[length_string - 10]
+        ANPORT = decode_array[length_string - 9]
+        ANALOG = decode_array[length_string - 8]
+        DIGIN = decode_array[length_string - 7]
+        DIGOUT = decode_array[length_string - 6]
+        BATTERYX10 = decode_array[length_string - 5: length_string - 4]
 
-print(y)
-
-print(y + 72)

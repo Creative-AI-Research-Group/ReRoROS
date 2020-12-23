@@ -20,13 +20,8 @@ class GUI(tk.Frame):
     """ GUI & main """
 
     def __init__(self, gui_window):
-        # 1. instantiates a comms link to SIPS and ReRobot
-        print('1. setting up comms to the robot')
-        self.sips_comms = Comms()
-        input("Is the robot ready?")  # temp fix until flag sorted
-
+        # 1. instantiates a  link to SIPS and ReRobot
         self.robot = Robot()
-        input("Is the robot ready?")  # temp fix until flag sorted
 
         """ Initialize the Frame"""
         tk.Frame.__init__(self, gui_window)
@@ -60,19 +55,19 @@ class GUI(tk.Frame):
 
     def create_sips(self):
 
-        label_battery = tk.Label(master=self, text=f"Battery Level = {config.BATTERY}")
+        label_battery = tk.Label(master=self, text=f"Battery Level = {self.BATTERY}")
         label_battery.grid(row=0, column=4)
 
         label_compass = tk.Label(master=self, text=f"Spare = 0")
         label_compass.grid(row=1, column=4)
 
-        label_heading = tk.Label(master=self, text=f"Actual Heading = {config.THPOS}")
+        label_heading = tk.Label(master=self, text=f"Actual Heading = {self.THPOS}")
         label_heading.grid(row=2, column=4)
 
-        label_left_wheel = tk.Label(master=self, text=f"Left Wheel Vel = {config.L_VEL}")
+        label_left_wheel = tk.Label(master=self, text=f"Left Wheel Vel = {self.L_VEL}")
         label_left_wheel.grid(row=3, column=4)
 
-        label_right_wheel = tk.Label(master=self, text=f"Right Wheel Vel = {config.R_VEL}")
+        label_right_wheel = tk.Label(master=self, text=f"Right Wheel Vel = {self.R_VEL}")
         label_right_wheel.grid(row=4, column=4)
 
     def update_sip(self):
@@ -91,30 +86,30 @@ class GUI(tk.Frame):
         # self.destroy()
         # exit()
         running = False
-
-# local movement controls
-    def stop(self):
-        robot.stop()
-
-    def step_forward(self):
-        robot.move(10)
-        sleep(0.5)
-        robot.stop()
-
-    def step_backward(self):
-        robot.move(-10)
-        sleep(0.5)
-        robot.stop()
-
-    def step_left(self):
-        robot.rvel(20)
-        sleep(0.5)
-        robot.stop()
-
-    def step_right(self):
-        robot.rvel(-20)
-        sleep(0.5)
-        robot.stop()
+#
+# # local movement controls
+#     def stop(self):
+#         robot.stop()
+#
+#     def step_forward(self):
+#         robot.move(10)
+#         sleep(0.5)
+#         robot.stop()
+#
+#     def step_backward(self):
+#         robot.move(-10)
+#         sleep(0.5)
+#         robot.stop()
+#
+#     def step_left(self):
+#         robot.rvel(20)
+#         sleep(0.5)
+#         robot.stop()
+#
+#     def step_right(self):
+#         robot.rvel(-20)
+#         sleep(0.5)
+#         robot.stop()
 
     def pulse(self):
         global slow_loop

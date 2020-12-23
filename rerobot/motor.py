@@ -149,7 +149,7 @@ class Motor(Comms):
 
     def stop(self):
         # self.send_cmd(b'\xFA\xFB\x03\x1D\x00\x1D')   # all stop command
-        self.write([self.HEADER1, self.HEADER2, self.SHORTCOUNT, self.STOP, 00, 29])   # all stop command
+        self.write(self.STOP_COMMAND)   # all stop command
 
     def checksum(self, code):
         # TODO will need to amend when large number come through
@@ -159,12 +159,6 @@ class Motor(Comms):
         cs_a = sum(ls_a)
         cs_b = sum(ls_b)
         return [cs_a, cs_b]
-
-    # def sip_read(self):
-    #     read_data = self.read()
-    #     print(f'return message is {read_data}')
-    #     self.decode(read_data)
-    #     # self.comms.flush()
 
     # Set independent wheel velocities;
     #  bits 0-7 for right wheel,
@@ -178,4 +172,4 @@ class Motor(Comms):
     def terminate(self):
         print ('Closing down all connections')
         # close_down_code = b"\xFA\xFB\x03\x02\x00\x02"
-        self.close_sequence(self.close_down_code)
+        self.close_sequence(self.CLOSE_DOWN_CODE)

@@ -20,11 +20,12 @@ class Comms:
     POSITIVE = 59
     NEGATIVE = 27
 
-    # define commands
+    # Before Client Connection
     SYNC0 = 0
     SYNC1 = 1
     SYNC2 = 2
 
+    # After Established Connection
     PULSE = 0
     OPEN = 1
     CLOSE = 2
@@ -35,17 +36,25 @@ class Comms:
     ROTATE = 9
     SETRV = 10
     VEL = 11
+    HEAD = 12
+    DHEAD = 13
     CONFIG = 18
+    RVEL = 21
     SETRA = 23
     SONAR = 28 # 1=enable, 0=disable all the sonar
     STOP = 29
+    # Set independent wheel velocities; bits 0-7 for right
+    # wheel, bits 8-15 for left wheel; in 20mm/sec
+    # increments.
     VEL2 = 32
     GRIPPER = 33
     IOREQUEST = 40 # Request one (1), a continuous stream (>1), or stop (0) IO SIPs
     HOSTBAUD = 50
 
     # complex codes
-    close_down_code = [HEADER1, HEADER2, SHORTCOUNT, SYNC2, 0, 2]
+    CLOSE_DOWN_CODE = [HEADER1, HEADER2, SHORTCOUNT, SYNC2, 0, 2]
+    HEARTBEAT = [HEADER1, HEADER2, SHORTCOUNT, SYNC0, 0, 0]
+    STOP_COMMAND = [HEADER1, HEADER2, SHORTCOUNT, STOP, 00, 29]
 
     # sipp reporting
     L_VEL = 0
@@ -94,13 +103,13 @@ class Comms:
         # parse sips
         decode_array = list(read_data)
         for i, bytes in enumerate(decode_array):
-            if bytes[i] == self.HEADER1 and bytes[i+1] == self.HEADER2:
+            if bytes == self.HEADER1 and decode_array[i+1] == self.HEADER2:
 
                 # assign relevant bytes to robots vars
-                length_string = list(decode_array[i + 2][0])
+                length_string = decode_array[i + 2]
                 self.TYPE = decode_array[i + 3] #  s = 2 when motors stopped or 3 when robot moving
                 self.XPOS = decode_array[i + 4: i + 5]
-                self.YPOS = decode_array[i + 6: i + 6]
+                self.YPOS = decode_array[i + 6: i + 7]
                 self.THPOS = decode_array[i + 8: i + 9]
                 self.L_VEL = decode_array[i + 10: i + 11]
                 self.R_VEL = decode_array[i + 12: i + 13]
@@ -115,7 +124,7 @@ class Comms:
                 self.ANALOG = decode_array[length_string - 8]
                 self.DIGIN = decode_array[length_string - 7]
                 self.DIGOUT = decode_array[length_string - 6]
-                self.BATTERYX10 = decode_array[length_string - 5: length]
+                self.BATTERYX10 = decode_array[length_string - 5: length_string - 4]
 
     # closes down server robot
     # and serial port
@@ -129,4 +138,4 @@ class Comms:
     def pulse(self):
         # writes a pulse (as raw Hex for now)
         # self.ser.write(b"\xFA\xFB\x03\x00\x00\x00")
-        self.ser.write([self.HEADER1, self.HEADER2, self.SHORTCOUNT, self.SYNC0, 0, 0])
+        self.ser.write(self.HEARTBEAT)
