@@ -11,9 +11,13 @@ class Robot():
         self.motor = Motor()
 
     # ReRoBot specific commands
-    def move(self, dist=10.0):
+    def nudge(self, dist=10.0):
         """Translate (+) forward or (-) back mm distance at SETV speed"""
         self.motor.cmd(self.motor.MOVE, value=dist)
+
+    def move(self, speed=10.0):
+        """Move forward (+) or reverse (-) at millimeters per second"""
+        self.motor.cmd(self.motor.VEL, value=speed)
 
     def rvel(self, speed=10.0):
         """Rotate robot at (+) counter- or (–) clockwise; degrees/sec (SETRV limit)."""
@@ -32,12 +36,12 @@ class Robot():
 
     # useful UI commands
     def step_forward(self):
-        self.move(10)
+        self.nudge(10)
         sleep(0.5)
         self.stop()
 
     def step_backward(self):
-        self.move(-10)
+        self.nudge(-10)
         sleep(0.5)
         self.stop()
 
@@ -60,10 +64,10 @@ class Robot():
         self.motor.left(1)
         self.motor.right(1)
 
-    def forward(self, speed=1.0):
+    def forward(self, speed=10.0):
         self.move(speed)
 
-    def backward(self, speed=1.0):
+    def backward(self, speed=10.0):
         self.move(-speed)
 
     def stop(self):
