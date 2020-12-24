@@ -4,6 +4,7 @@ and assigns relevent info to a variable.
 """
 
 import serial
+from time import sleep
 
 class Comms:
     # Full codes and info:
@@ -36,6 +37,7 @@ class Comms:
     HEAD = 12
     DHEAD = 13
     CONFIG = 18
+    ENCODER = 19
     RVEL = 21
     SETRA = 23
     SONAR = 28 # 1=enable, 0=disable all the sonar
@@ -54,6 +56,7 @@ class Comms:
     CLOSE_DOWN_CODE = [HEADER1, HEADER2, SHORTCOUNT, SYNC2, 0, 2]
     HEARTBEAT = [HEADER1, HEADER2, SHORTCOUNT, SYNC0, 0, 0]
     STOP_COMMAND = [HEADER1, HEADER2, SHORTCOUNT, STOP, 00, 29]
+    SIP_REQUEST = [HEADER1, HEADER2, BYTECOUNT, ENCODER, POSITIVE, 1, 20, 59]
 
     # UI reporting variables from SIPPS
     L_VEL = 0
@@ -86,6 +89,7 @@ class Comms:
 
     # read from server buffer
     def read(self):
+        # Read incoming SIP
         incoming = self.ser.read(255)
         print (f'READING = {incoming}')
         self.flush()
@@ -93,6 +97,13 @@ class Comms:
 
     # parse SIPPS codes
     def sip_read(self):
+        # Send ENCODE SIP request (might need IO SIP request!!)
+        self.write(self.SIP_REQUEST)
+
+        # Wait a tick
+        sleep(0.01)
+
+        # Read incoming SIP
         read_data = self.read()
         print(f'return message is {read_data}')
 

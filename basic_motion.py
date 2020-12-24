@@ -19,7 +19,7 @@ class GUI(tk.Frame):
     """ GUI & main """
 
     # defining global vars
-    UPDATE_RATE = 10
+    UPDATE_RATE = 100
 
     def __init__(self):
         # Create robot move object and Comms inheritance

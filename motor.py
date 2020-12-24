@@ -33,7 +33,8 @@ class Motor(Comms):
         #                      b"\xFA\xFB\x06\x12\x3B\x01\x00\x13\x3B",
         #                      b"\xFA\xFB\x06\x32\x3B\x02\x00\x34\x3B\xFA\xFB\x03\x00\x00\x00"
         opening_codes = [self.HEADER1, self.HEADER2, self.BYTECOUNT, self.OPEN, self.POSITIVE, 1, 0, 2, 59,
-                         self.HEADER1, self.HEADER2, self.BYTECOUNT, self.IOREQUEST, self.POSITIVE, 1, 0, 41, 59], \
+                         self.HEADER1, self.HEADER2, self.BYTECOUNT, self.IOREQUEST, self.POSITIVE, 1, 0, 41, 59,
+                         self.HEADER1, self.HEADER2, self.BYTECOUNT, self.ENCODER, self.POSITIVE, 0, 0, 19, 59], \
                         [self.HEADER1, self.HEADER2, self.BYTECOUNT, self.CONFIG, self.POSITIVE, 1, 0, 19, 59], \
                         [self.HEADER1, self.HEADER2, self.BYTECOUNT, self.HOSTBAUD, self.POSITIVE, 2, 0, 52, 59,
                          self.HEADER1, self.HEADER2, self.SHORTCOUNT, self.SYNC0, 0, 0]
