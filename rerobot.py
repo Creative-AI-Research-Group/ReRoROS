@@ -10,7 +10,7 @@ class Robot():
     def __init__(self):
         self.motor = Motor()
 
-    # ReRoBot specific commands
+    # ReRoBot specific commands (selection)
     def nudge(self, dist=10.0):
         """Translate (+) forward or (-) back mm distance at SETV speed"""
         self.motor.cmd(self.motor.MOVE, value=dist)
