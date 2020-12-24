@@ -83,7 +83,7 @@ class Comms:
         print(f'sending hex message: {msg_hx} to {self.ser.port}')
         self.ser.write(msg_hx)
 
-    # fluch buffer
+    # flush buffer
     def flush(self):
         self.ser.flushInput()
 
@@ -95,14 +95,12 @@ class Comms:
         self.flush()
         return incoming
 
-    # parse SIPPS codes
-    def sip_read(self):
+    def send_sip_request(self):
         # Send ENCODE SIP request (might need IO SIP request!!)
         self.write(self.SIP_REQUEST)
 
-        # Wait a tick
-        sleep(0.01)
-
+    # parse SIPPS codes
+    def parse_sip(self):
         # Read incoming SIP
         read_data = self.read()
         print(f'return message is {read_data}')

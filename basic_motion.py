@@ -81,8 +81,11 @@ class GUI(tk.Frame):
         label_right_wheel.grid(row=4, column=4)
 
     def updater(self):
+        # send SIP request
+        self.robot.motor.send_sip_request()
+
         # read incoming SIPS from client robot
-        self.robot.motor.sip_read()
+        self.robot.motor.parse_sip()
 
         # refresh SIPS windows
         self.create_sips()
