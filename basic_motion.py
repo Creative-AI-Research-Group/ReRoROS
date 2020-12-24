@@ -12,7 +12,6 @@ python3 basic_motion.py
 
 from time import sleep
 from rerobot import Robot
-from comms import Comms
 import tkinter as tk
 import atexit
 
@@ -23,11 +22,8 @@ class GUI(tk.Frame):
     UPDATE_RATE = 10
 
     def __init__(self):
-        # Create robot move object
+        # Create robot move object and Comms inheritance
         self.robot = Robot()
-
-        # Create robot comms object for SIPS
-        self.comms = Comms()
 
         # Build GUI
         print('building GUI')
@@ -69,30 +65,30 @@ class GUI(tk.Frame):
         btn_quit.grid(row=2, column=2, sticky="nsew")
 
     def create_sips(self):
-        label_battery = tk.Label(master=self, text=f"Battery Level = {self.comms.BATTERY}")
+        label_battery = tk.Label(master=self, text=f"Battery Level = {self.robot.motor.BATTERY}")
         label_battery.grid(row=0, column=4)
 
         label_compass = tk.Label(master=self, text=f"Spare = 0")
         label_compass.grid(row=1, column=4)
 
-        label_heading = tk.Label(master=self, text=f"Actual Heading = {self.comms.THPOS}")
+        label_heading = tk.Label(master=self, text=f"Actual Heading = {self.robot.motor.THPOS}")
         label_heading.grid(row=2, column=4)
 
-        label_left_wheel = tk.Label(master=self, text=f"Left Wheel Vel = {self.comms.L_VEL}")
+        label_left_wheel = tk.Label(master=self, text=f"Left Wheel Vel = {self.robot.motor.L_VEL}")
         label_left_wheel.grid(row=3, column=4)
 
-        label_right_wheel = tk.Label(master=self, text=f"Right Wheel Vel = {self.comms.R_VEL}")
+        label_right_wheel = tk.Label(master=self, text=f"Right Wheel Vel = {self.robot.motor.R_VEL}")
         label_right_wheel.grid(row=4, column=4)
 
     def updater(self):
         # read incoming SIPS from client robot
-        self.comms.sip_read()
+        self.robot.motor.sip_read()
 
         # refresh SIPS windows
         self.create_sips()
 
         # send a heartbeat pulse
-        self.comms.pulse()
+        self.robot.motor.pulse()
 
         # "... and start all over again"
         self.after(self.UPDATE_RATE, self.updater)
