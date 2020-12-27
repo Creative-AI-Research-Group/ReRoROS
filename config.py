@@ -1,5 +1,0 @@
-L_VEL = 0
-R_VEL = 0
-THPOS = 0
-BATTERY = 0
-COMPASS = 0

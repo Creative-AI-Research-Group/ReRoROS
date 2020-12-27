@@ -58,11 +58,24 @@ class Comms:
     STOP_COMMAND = [HEADER1, HEADER2, SHORTCOUNT, STOP, 00, 29]
     SIP_REQUEST = [HEADER1, HEADER2, BYTECOUNT, ENCODER, POSITIVE, 1, 20, 59]
 
-    # UI reporting variables from SIPPS
-    L_VEL = 0
-    R_VEL = 0
-    THPOS = 0
-    BATTERY = 0
+    # Dictionary made from SIPS for UI reporting variables
+    sips_dict = {'TYPE': 0,
+                 'XPOS': 0,
+                 'YPOS': 0,
+                 'THPOS': 0,
+                 'L_VEL': 0,
+                 'R_VEL': 0,
+                 'BATTERY': 0,
+                 'BUMPERS': 0,
+                 'CONTROL': 0,
+                 'FLAGS': 0,
+                 'COMPASS': 0,
+                 'GRIP_STATE': 0,
+                 'ANPORT': 0,
+                 'ANALOG': 0,
+                 'DIGIN': 0,
+                 'DIGOUT': 0,
+                 'ANALOGUE': 0}
 
     def __init__(self):
         print(f'initialise connection to host\n'
@@ -112,24 +125,24 @@ class Comms:
 
                 # assign relevant bytes to robots vars
                 length_string = decode_array[i + 2]
-                self.TYPE = decode_array[i + 3]
-                self.XPOS = decode_array[i + 4: i + 5]
-                self.YPOS = decode_array[i + 6: i + 7]
-                self.THPOS = decode_array[i + 8: i + 9]
-                self.L_VEL = decode_array[i + 10: i + 11]
-                self.R_VEL = decode_array[i + 12: i + 13]
-                self.BATTERY = decode_array[i + 14]
-                self.BUMPERS = decode_array[i + 15: i + 16]
-                self.CONTROL = decode_array[i + 17: i + 18]
-                self.FLAGS = decode_array[i + 19: i + 20]
-                self.COMPASS = decode_array[i + 21]
+                self.sips_dict['TYPE'] = decode_array[i + 3]
+                self.sips_dict['XPOS'] = decode_array[i + 4: i + 5]
+                self.sips_dict['YPOS'] = decode_array[i + 6: i + 7]
+                self.sips_dict['THPOS'] = decode_array[i + 8: i + 9]
+                self.sips_dict['L_VEL'] = decode_array[i + 10: i + 11]
+                self.sips_dict['R_VEL'] = decode_array[i + 12: i + 13]
+                self.sips_dict['BATTERY'] = decode_array[i + 14]
+                self.sips_dict['BUMPERS'] = decode_array[i + 15: i + 16]
+                self.sips_dict['CONTROL'] = decode_array[i + 17: i + 18]
+                self.sips_dict['FLAGS'] = decode_array[i + 19: i + 20]
+                self.sips_dict['COMPASS'] = decode_array[i + 21]
 
-                self.GRIP_STATE = decode_array[length_string - 10]
-                self.ANPORT = decode_array[length_string - 9]
-                self.ANALOG = decode_array[length_string - 8]
-                self.DIGIN = decode_array[length_string - 7]
-                self.DIGOUT = decode_array[length_string - 6]
-                self.BATTERYX10 = decode_array[length_string - 5: length_string - 4]
+                self.sips_dict['GRIP_STATE'] = decode_array[length_string - 10]
+                self.sips_dict['ANPORT'] = decode_array[length_string - 9]
+                self.sips_dict['ANALOG'] = decode_array[length_string - 8]
+                self.sips_dict['DIGIN'] = decode_array[length_string - 7]
+                self.sips_dict['DIGOUT'] = decode_array[length_string - 6]
+                self.sips_dict['ANALOGUE'] = decode_array[length_string - 5: length_string - 4]
 
     # closes down server robot and serial port
     def close_sequence(self, terminate_code):

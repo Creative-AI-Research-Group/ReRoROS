@@ -65,19 +65,19 @@ class GUI(tk.Frame):
         btn_quit.grid(row=2, column=2, sticky="nsew")
 
     def create_sips(self):
-        label_battery = tk.Label(master=self, text=f"Battery Level = {self.robot.motor.BATTERY}")
+        label_battery = tk.Label(master=self, text=f"Battery Level = {self.robot.motor.sips_dict.value['BATTERY']}")
         label_battery.grid(row=0, column=4)
 
-        label_compass = tk.Label(master=self, text=f"Spare = 0")
+        label_compass = tk.Label(master=self, text=f"Bumpers = {self.robot.motor.sips_dict.value['BUMPERS']}")
         label_compass.grid(row=1, column=4)
 
-        label_heading = tk.Label(master=self, text=f"Actual Heading = {self.robot.motor.THPOS}")
+        label_heading = tk.Label(master=self, text=f"Actual Heading = {self.robot.motor.sips_dict.value['THPOS']}")
         label_heading.grid(row=2, column=4)
 
-        label_left_wheel = tk.Label(master=self, text=f"Left Wheel Vel = {self.robot.motor.L_VEL}")
+        label_left_wheel = tk.Label(master=self, text=f"Left Wheel Vel = {self.robot.motor.sips_dict.value['L_VEL']}")
         label_left_wheel.grid(row=3, column=4)
 
-        label_right_wheel = tk.Label(master=self, text=f"Right Wheel Vel = {self.robot.motor.R_VEL}")
+        label_right_wheel = tk.Label(master=self, text=f"Right Wheel Vel = {self.robot.motor.sips_dict.value['R_VEL']}")
         label_right_wheel.grid(row=4, column=4)
 
     def updater(self):
