@@ -112,7 +112,7 @@ class Comms:
         # Send ENCODE SIP request (might need IO SIP request!!)
         self.write(self.SIP_REQUEST)
 
-    # parse SIPPS codes
+    # parse SIPS codes
     def parse_sip(self):
         # Read incoming SIP
         read_data = self.read()
