@@ -30,6 +30,7 @@ class GUI(tk.Frame):
         self.gui = tk.Tk()
         self.gui.title("Robot Control")
         self.gui.geometry("700x500")
+        self.gui.configure(background='light slate gray')
 
         # Initialize the Frame
         tk.Frame.__init__(self, self.gui)
