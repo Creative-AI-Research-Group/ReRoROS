@@ -1,9 +1,9 @@
 #
-#   tangle.py
-#   cover / illustration for PbR handbook
-#   (c) Fabrizio Augusto Poltronieri
-#   fabrizio.poltronieri@dmu.ac.uk
-#   22/03/2021
+#   arm.py
+#   class for Lynxmotion LSS robot arm
+#   (c) Craig Vear
+#   cvear@dmu.ac.uk
+#   24/03/2021
 #
 
 # Import required libraries
@@ -12,8 +12,8 @@ import random
 from pygame import mouse
 
 # Import LSS library
-import lss
-import lss_const as lssc
+import arm.lss as lss
+import arm.lss_const as lssc
 
 
 class Arm:
@@ -34,8 +34,6 @@ class Arm:
     # Set standard positions - RELATIVE
     open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to recieve pen
     hold_pen_rel = [180, -900, 900, 0, 0]  # closes claw for pen
-
-
 
     def __init__(self):
         print ('Init robot arm')
@@ -75,7 +73,7 @@ class Arm:
 
             # move joint in dance
             moving_joint = self.lss_list[rnd_joint]
-            moving_joint.moveRelative(rnd_delta, rnd_speed)
+            moving_joint.moveRelativeSpeed(rnd_delta, rnd_speed)
 
             # while not is_in_posiiton:
 
