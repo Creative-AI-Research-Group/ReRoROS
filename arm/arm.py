@@ -94,8 +94,7 @@ class Arm:
         # logging
         self.sips_logging = False
 
-    # lss shared commands
-
+    #### lss shared commands ####
     # resets all joints
     def reset_arm(self):
         for joint in self.lss_list:
@@ -151,9 +150,7 @@ class Arm:
         joint = self.lss_list[joint]
         joint.moveRelativeSpeed(delta, speed)
 
-
-    # drawing specific commands
-
+    #### drawing specific commands ####
     # gets into drawing position
     def draw_ready(self):
         for i, joint in enumerate(self.lss_list):
@@ -178,6 +175,8 @@ class Arm:
             joint.move(self.sleep_position_abs[i])
         self.hold()
 
+    def drawing(self):
+        pass
 
     # animation functions while waiting
     def waiting_dance(self):
@@ -193,25 +192,10 @@ class Arm:
 
             # while not is_in_posiiton:
 
-
     def tracking_human_pencil_while_waiting(self):
         pass
 
-
-    def drawing(self):
-        pass
-
-
-
-
-
-
-
-
-
-
-    # telemetry
-
+    #### telemetry ####
     # reads the sips from LSS and get current position
     def get_positions(self):
         # Get the values from LSS
@@ -244,12 +228,6 @@ class Arm:
             return True
         else:
             return False
-
-
-    # def mouse_position(self):
-    #     pos = pygame.mouse.get_pos()
-
-
 
 
     # Terminate objects
