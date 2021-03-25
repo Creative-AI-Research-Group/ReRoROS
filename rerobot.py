@@ -5,9 +5,10 @@ It translates all the basic commands into motor-class based code.
 from motor import Motor
 from time import sleep
 
-class Robot():
+class Robot:
 
     def __init__(self):
+        # initiates the motor class for comms with the Pioneer OS
         self.motor = Motor()
 
     # ReRoBot specific commands (selection)

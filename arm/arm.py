@@ -5,40 +5,45 @@
 #   cvear@dmu.ac.uk
 #   24/03/2021
 #
-
+"""This class is a handler and interfaces between the GUI and the LSS clasess supplied by Lynxmotio.
+It translates all the basic commands for drawing arm into LSS-class based code.
+"""
 # Import required libraries
 import time
 import random
 from pygame import mouse
 
 # Import LSS library
-import arm.lss as lss
-import arm.lss_const as lssc
+import lss
+import lss_const as lssc
 
 
 class Arm:
-    print('init serial comms to LynxMotion board')
-
-    # Open constants
-    CST_LSS_Port = "/dev/cu.usbserial-AG4UPOC05"
-    CST_LSS_Baud = lssc.LSS_DefaultBaud
-
-    # Create and open a serial port
-    lss.initBus(CST_LSS_Port, CST_LSS_Baud)
-    print('port opened')
-
-    # Set standard positions - ABSOLUTES
-    sleep_position_abs = [180, -900, 900, 0, 0]  # absolute arm position for hold
-    draw_ready_abs = [183, -309, 230, 432, 0]  # waits
-
-    # Set standard positions - RELATIVE
-    open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to recieve pen
-    hold_pen_rel = [180, -900, 900, 0, 0]  # closes claw for pen
-
     def __init__(self):
-        print ('Init robot arm')
+        print('init serial comms to LynxMotion board')
+        print('Init robot arm')
+
+        # Open constants
+        self.CST_LSS_Port = "/dev/cu.usbserial-AG4UPOC05" # Mac platform
+        # self.CST_LSS_Port = "/dev/ttyUSB0" # For Linux/Unix platforms
+        # self.CST_LSS_Port = "COM230"  # For windows platforms
+        self.CST_LSS_Baud = lssc.LSS_DefaultBaud
+
+        # Create and open a serial port
+        lss.initBus(self.CST_LSS_Port, self.CST_LSS_Baud)
+        print('port opened')
+
+        # Set standard positions - ABSOLUTES
+        self.sleep_position_abs = [180, -900, 900, 0, 0]  # absolute arm position for hold
+        self.draw_ready_abs = [183, -309, 230, 432, 0]  # waits
+
+        # Set standard positions - RELATIVE
+        self.open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to recieve pen
+        self.hold_pen_rel = [180, -900, 900, 0, 0]  # closes claw for pen
+
+
         # define safety params
-        self.my_max_speed = 1
+        self.my_max_speed = 100
 
         # Create LSS objects
         self.myLSS1 = lss.LSS(1)
@@ -47,7 +52,7 @@ class Arm:
         self.myLSS4 = lss.LSS(4)
         self.myLSS5 = lss.LSS(5)
 
-        # Set safety params
+        # Set safety params (it seems these are ignored by arm OS when using moveSpeed
         self.myLSS1.setMaxSpeed(self.my_max_speed, lssc.LSS_SetConfig)
         self.myLSS2.setMaxSpeed(self.my_max_speed, lssc.LSS_SetConfig)
         self.myLSS3.setMaxSpeed(self.my_max_speed, lssc.LSS_SetConfig)
@@ -77,6 +82,15 @@ class Arm:
 
             # while not is_in_posiiton:
 
+    # moves arm from given list of absolute positions and speed
+    def move_speed(self, pos, speed):
+        for i, joint in enumerate(self.lss_list):
+            joint.moveSpeed(pos[i], speed)
+
+    def move_relative_speed(self, delta, speed):
+        delta_list = self.parse_move()
+        for i, joint in enumerate(self.lss_list):
+            joint.moveRelativeSpeed(delta_list[i], speed)
 
     def drawing(self):
         pass
@@ -88,6 +102,8 @@ class Arm:
     def home(self):
         for i, joint in enumerate(self.lss_list):
             joint.moveSpeed(self.sleep_position_abs[i], 100)
+
+    def parse_move(self, )
 
     def get_positions(self):
         # Get the values from LSS
@@ -115,18 +131,15 @@ class Arm:
         else:
             return False
 
-    def mouse_position(self):
-        pos = pygame.mouse.get_pos()
+    def reset(self):
 
-    def move_parse(self):
-        pass
+    # def mouse_position(self):
+    #     pos = pygame.mouse.get_pos()
+
 
     def reset_arm(self):
-        self.myLSS1.reset()
-        self.myLSS2.reset()
-        self.myLSS3.reset()
-        self.myLSS4.reset()
-        self.myLSS5.reset()
+        for joint in self.lss_list:
+            joint.reset()
 
     # Terminate objects
     def terminate(self):

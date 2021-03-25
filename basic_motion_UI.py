@@ -7,7 +7,7 @@ list ports
 FIX PERMISSIONS - sudo chmod 666 /dev/ttyUSB0
 cd python
 cd ReRoRos_v1
-python3 basic_motion.py
+python3 basic_motion_UI.py
 """
 
 from time import sleep
