@@ -175,7 +175,8 @@ class Arm:
             joint.move(self.sleep_position_abs[i])
         self.hold()
 
-    def drawing(self):
+    def draw(self, pos):
+        # todo something complex with x, y mouse pos into 5 dof robot arm HAHA!!
         pass
 
     # animation functions while waiting

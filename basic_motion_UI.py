@@ -13,7 +13,6 @@ python3 basic_motion_UI.py
 from time import sleep
 from rerobot import Robot
 import tkinter as tk
-import atexit
 
 class GUI(tk.Frame):
     """ GUI & main """
