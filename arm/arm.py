@@ -38,8 +38,8 @@ class Arm:
         self.draw_ready_abs = [183, -309, 230, 432, 0]  # waits
 
         # Set standard positions - RELATIVE
-        self.open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to recieve pen
-        self.hold_pen_rel = [180, -900, 900, 0, 0]  # closes claw for pen
+        self.open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to receive pen
+        self.hold_pen_rel = [0, 0, 0, 0, 0]  # closes claw for pen
 
 
         # define safety params
@@ -66,9 +66,120 @@ class Arm:
                          self.myLSS4,
                          self.myLSS5]
 
+        self.lss_list_str = ['myLSS1',
+                         'myLSS2',
+                         'myLSS3',
+                         'myLSS4',
+                         'myLSS5']
+
+        # define joint dict for current position
+        self.joint_dict_pos = {'myLSS1': 0,
+                               'myLSS2': 0,
+                               'myLSS3': 0,
+                               'myLSS4': 0,
+                               'myLSS5': 0
+                               }
+
+        # define joint dict for next pos
+        self.joint_dict_next_pos = {'myLSS1': 0,
+                               'myLSS2': 0,
+                               'myLSS3': 0,
+                               'myLSS4': 0,
+                               'myLSS5': 0
+                               }
+
         # Instance params
         self.waiting = False
 
+        # logging
+        self.sips_logging = False
+
+    # lss shared commands
+
+    # resets all joints
+    def reset_arm(self):
+        for joint in self.lss_list:
+            joint.reset()
+
+    # all joints limp - safety mode
+    def limp_arm(self):
+        for joint in self.lss_list:
+            joint.limp()
+
+    # locks motors at current pos
+    def hold(self):
+        for i, joint in enumerate(self.lss_list):
+            joint.hold()
+
+    # move arm to abolsute pos or predefined pos
+    def move_arm(self, pos):
+        for i, joint in enumerate(self.lss_list):
+            joint.move(pos)
+
+    # move joint to absolute position
+    def move_joint(self, joint, pos):
+        joint = self.lss_list[joint]
+        joint.move(pos)
+
+    # move arm to relative pos with delta
+    def move_arm_relative(self, delta):
+        for i, joint in enumerate(self.lss_list):
+            joint.moveRelative(delta)
+
+    # move joint to relative pos with delta
+    def move_joint_relative(self, joint, delta):
+        joint = self.lss_list[joint]
+        joint.moveRelative(delta)
+
+    # moves arm to absolute positions or preset, optional speed
+    def move_arm_speed(self, pos, speed=None):
+        for i, joint in enumerate(self.lss_list):
+            joint.moveSpeed(pos[i], speed)
+
+    # moves a joint to absolute position, optional speed
+    def move_joint_speed(self, joint, pos, speed=None):
+        joint = self.lss_list[joint]
+        joint.moveSpeed(pos, speed)
+
+    # moves arm relative to delta, optional speed
+    def move_arm_relative_speed(self, delta, speed=None):
+        for i, joint in enumerate(self.lss_list):
+            joint.moveRelativeSpeed(delta, speed)
+
+    # moves joint relative to delta, optional speed
+    def move_joint_relative_speed(self, joint, delta, speed=None):
+        joint = self.lss_list[joint]
+        joint.moveRelativeSpeed(delta, speed)
+
+
+    # drawing specific commands
+
+    # gets into drawing position
+    def draw_ready(self):
+        for i, joint in enumerate(self.lss_list):
+            joint.moveSpeed(self.draw_ready_abs[i], 50)
+
+    # opens claw for pen
+    def open_claw(self):
+        self.move_arm_relative_speed(self.open_pen_rel, 50)
+
+    # closes claw for pen
+    def close_claw(self):
+        self.move_arm_relative_speed(self.hold_pen_rel, 50)
+
+    # returns arm to home/ sleep position
+    def home(self):
+        for i, joint in enumerate(self.lss_list):
+            joint.move(self.sleep_position_abs[i])
+
+    # returns arm to home/ sleep position and holds
+    def home_hold(self):
+        for i, joint in enumerate(self.lss_list):
+            joint.move(self.sleep_position_abs[i])
+        self.hold()
+
+
+    # animation functions while waiting
     def waiting_dance(self):
         while self.waiting:
             # get random vars
@@ -82,40 +193,43 @@ class Arm:
 
             # while not is_in_posiiton:
 
-    # moves arm from given list of absolute positions and speed
-    def move_speed(self, pos, speed):
-        for i, joint in enumerate(self.lss_list):
-            joint.moveSpeed(pos[i], speed)
 
-    def move_relative_speed(self, delta, speed):
-        delta_list = self.parse_move()
-        for i, joint in enumerate(self.lss_list):
-            joint.moveRelativeSpeed(delta_list[i], speed)
+    def tracking_human_pencil_while_waiting(self):
+        pass
+
 
     def drawing(self):
         pass
 
-    def draw(self):
-        for i, joint in enumerate(self.lss_list):
-            joint.moveSpeed(self.draw_ready_abs[i], 100)
 
-    def home(self):
-        for i, joint in enumerate(self.lss_list):
-            joint.moveSpeed(self.sleep_position_abs[i], 100)
 
-    def parse_move(self, )
 
+
+
+
+
+
+
+    # telemetry
+
+    # reads the sips from LSS and get current position
     def get_positions(self):
         # Get the values from LSS
-        print("\r\nQuerying LSS...")
+        if self.sips_logging:
+            print("\r\nQuerying LSS...")
 
-        for joint in self.lss_list:
+        for i, joint in enumerate(self.lss_list):
             pos = joint.getPosition()
             max_s = joint.getMaxSpeed()
             max_s_rpm = joint.getMaxSpeedRPM()
-            print(f"Position  {joint} (1/10 deg) = ", str(pos))
-            print(f'max speed = {max_s}; max speed RPMM = {max_s_rpm}')
+            if self.sips_logging:
+                print(f"Position  {joint} (1/10 deg) = ", str(pos))
+                print(f'max speed = {max_s}; max speed RPMM = {max_s_rpm}')
 
+            joint_dict = self.lss_list_str[i]
+            self.joint_dict_pos[joint_dict] = pos
+
+    # calcs where nest position of arm should be
     def is_in_position(self, position):
         pos_list = []
         pos_count = 0
@@ -131,15 +245,12 @@ class Arm:
         else:
             return False
 
-    def reset(self):
 
     # def mouse_position(self):
     #     pos = pygame.mouse.get_pos()
 
 
-    def reset_arm(self):
-        for joint in self.lss_list:
-            joint.reset()
+
 
     # Terminate objects
     def terminate(self):
