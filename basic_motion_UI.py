@@ -107,3 +107,4 @@ class GUI(tk.Frame):
 
 if __name__ == "__main__":
     window = GUI()
+    window.mainloop()

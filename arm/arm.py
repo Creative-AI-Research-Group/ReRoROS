@@ -34,8 +34,8 @@ class Arm:
         print('port opened')
 
         # Set standard positions - ABSOLUTES
-        self.sleep_position_abs = [180, -900, 900, 0, 0]  # absolute arm position for hold
-        self.draw_ready_abs = [183, -309, 230, 432, 0]  # waits
+        self.sleep_position_abs = [0, -900, 900, 0, 0]  # absolute arm position for hold
+        self.draw_ready_abs = [0, -350, 450, 0, 0]  # waits
 
         # Set standard positions - RELATIVE
         self.open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to receive pen
@@ -117,7 +117,7 @@ class Arm:
 
     # move joint to absolute position
     def move_joint(self, joint, pos):
-        joint = self.lss_list[joint]
+        joint = self.lss_list[joint-1]
         joint.move(pos)
 
     # move arm to relative pos with delta
@@ -127,7 +127,7 @@ class Arm:
 
     # move joint to relative pos with delta
     def move_joint_relative(self, joint, delta):
-        joint = self.lss_list[joint]
+        joint = self.lss_list[joint-1]
         joint.moveRelative(delta)
 
     # moves arm to absolute positions or preset, optional speed
@@ -137,7 +137,7 @@ class Arm:
 
     # moves a joint to absolute position, optional speed
     def move_joint_speed(self, joint, pos, speed=None):
-        joint = self.lss_list[joint]
+        joint = self.lss_list[joint-1]
         joint.moveSpeed(pos, speed)
 
     # moves arm relative to delta, optional speed
@@ -147,7 +147,7 @@ class Arm:
 
     # moves joint relative to delta, optional speed
     def move_joint_relative_speed(self, joint, delta, speed=None):
-        joint = self.lss_list[joint]
+        joint = self.lss_list[joint-1]
         joint.moveRelativeSpeed(delta, speed)
 
     #### drawing specific commands ####
@@ -167,12 +167,12 @@ class Arm:
     # returns arm to home/ sleep position
     def home(self):
         for i, joint in enumerate(self.lss_list):
-            joint.move(self.sleep_position_abs[i])
+            joint.moveSpeed(self.sleep_position_abs[i], 50)
 
     # returns arm to home/ sleep position and holds
     def home_hold(self):
         for i, joint in enumerate(self.lss_list):
-            joint.move(self.sleep_position_abs[i])
+            joint.moveSpeed(self.sleep_position_abs[i], 50)
         self.hold()
 
     def draw(self, pos):
@@ -248,7 +248,7 @@ class Arm:
 
 if __name__ == "__main__":
     bot_arm = Arm()
-    bot_arm.draw()
+    bot_arm.draw_ready()
     time.sleep(5)
     bot_arm.home()
     time.sleep(5)
