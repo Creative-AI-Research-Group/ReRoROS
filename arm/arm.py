@@ -36,6 +36,7 @@ class Arm:
         # Set standard positions - ABSOLUTES
         self.sleep_position_abs = [0, -900, 900, 0, 0]  # absolute arm position for hold
         self.draw_ready_abs = [0, -350, 450, 0, 0]  # waits
+        self.draw_in_position = [0, 30, 100, 700, 0]
 
         # Set standard positions - RELATIVE
         self.open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to receive pen
@@ -175,9 +176,13 @@ class Arm:
             joint.moveSpeed(self.sleep_position_abs[i], 50)
         self.hold()
 
-    def draw(self, pos):
-        # todo something complex with x, y mouse pos into 5 dof robot arm HAHA!!
-        pass
+    def draw(self):
+        for i, joint in enumerate(self.lss_list):
+            joint.moveSpeed(self.draw_in_position[i], 20)
+
+
+    # todo something complex with x, y mouse pos into 5 dof robot arm HAHA!!
+
 
     # animation functions while waiting
     def waiting_dance(self):

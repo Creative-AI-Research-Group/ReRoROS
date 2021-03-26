@@ -39,20 +39,14 @@ class ArmGUI(tk.Frame):
         btn_quit = tk.Button(master=self, text="1:ready", command=self.draw_ready, bg="red")
         btn_quit.grid(row=0, column=0, sticky="nsew")
 
-        btn_up = tk.Button(master=self, text="2.open\njaw", command=self.open_claw, bg="green")
+        btn_up = tk.Button(master=self, text="2.open\nclaw", command=self.open_claw, bg="green")
         btn_up.grid(row=0, column=1, sticky="nsew")
 
-        btn_draw = tk.Button(master=self, text="3. close\njaw", command=self.close_claw, bg="red")
+        btn_draw = tk.Button(master=self, text="3. close\nclaw", command=self.close_claw, bg="red")
         btn_draw.grid(row=0, column=2, sticky="nsew")
-
-        btn_quit = tk.Button(master=self, text="Q:QUIT", command=self.terminate, bg="red")
-        btn_quit.grid(row=1, column=0, sticky="nsew")
 
         btn_up = tk.Button(master=self, text="W:fwd", command=self.draw_arm_fwd, bg="green")
         btn_up.grid(row=1, column=1, sticky="nsew")
-
-        btn_draw = tk.Button(master=self, text="E:home", command=self.arm_home, bg="red")
-        btn_draw.grid(row=1, column=2, sticky="nsew")
 
         btn_down = tk.Button(master=self, text="A:left", command=self.draw_arm_left, bg="green")
         btn_down.grid(row=2, column=0, sticky="nsew")
@@ -71,6 +65,15 @@ class ArmGUI(tk.Frame):
 
         btn_quit = tk.Button(master=self, text="C:pen\ndown", command=self.pen_down, bg="red")
         btn_quit.grid(row=3, column=2, sticky="nsew")
+
+        btn_quit = tk.Button(master=self, text="Q:QUIT", command=self.terminate, bg="red")
+        btn_quit.grid(row=4, column=0, sticky="nsew")
+
+        btn_right = tk.Button(master=self, text="reset", command=self.reset, bg="green")
+        btn_right.grid(row=4, column=1, sticky="nsew")
+
+        btn_draw = tk.Button(master=self, text="E:home", command=self.arm_home, bg="red")
+        btn_draw.grid(row=4, column=2, sticky="nsew")
 
     def create_sips(self):
         """joint_dict_pos = {'myLSS1': 0, 'myLSS2': 0, 'myLSS3': 0, 'myLSS4': 0, 'myLSS5': 0}"""
@@ -135,13 +138,16 @@ class ArmGUI(tk.Frame):
         self.arm.draw_ready()
 
     def open_claw(self):
-        self.arm.open_claw()
+        self.arm.move_joint_relative_speed(5, -140, 20)
 
     def close_claw(self):
-        self.arm.close_claw()
+        self.arm.move_joint_relative_speed(5, 140, 20)
 
     def arm_draw(self):
-        self.arm.draw_ready()
+        self.arm.draw()
+
+    def reset(self):
+        self.arm.reset_arm()
 
     def keyboard_watcher(self):
         pass
