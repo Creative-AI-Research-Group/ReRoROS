@@ -36,32 +36,41 @@ class ArmGUI(tk.Frame):
 
     def create_widgets(self):
         """create the interactive buttons"""
-        btn_quit = tk.Button(master=self, text="Q:QUIT", command=self.terminate, bg="red")
+        btn_quit = tk.Button(master=self, text="1:ready", command=self.draw_ready, bg="red")
         btn_quit.grid(row=0, column=0, sticky="nsew")
 
-        btn_up = tk.Button(master=self, text="W:fwd", command=self.draw_arm_fwd, bg="green")
+        btn_up = tk.Button(master=self, text="2.open\njaw", command=self.open_claw, bg="green")
         btn_up.grid(row=0, column=1, sticky="nsew")
 
-        btn_draw = tk.Button(master=self, text="E:home", command=self.arm_home, bg="red")
+        btn_draw = tk.Button(master=self, text="3. close\njaw", command=self.close_claw, bg="red")
         btn_draw.grid(row=0, column=2, sticky="nsew")
 
-        btn_down = tk.Button(master=self, text="A:left", command=self.draw_arm_left, bg="green")
-        btn_down.grid(row=1, column=0, sticky="nsew")
+        btn_quit = tk.Button(master=self, text="Q:QUIT", command=self.terminate, bg="red")
+        btn_quit.grid(row=1, column=0, sticky="nsew")
 
-        btn_left = tk.Button(master=self, text="S:ready", command=self.draw_ready, bg="green")
-        btn_left.grid(row=1, column=1, sticky="nsew")
+        btn_up = tk.Button(master=self, text="W:fwd", command=self.draw_arm_fwd, bg="green")
+        btn_up.grid(row=1, column=1, sticky="nsew")
 
-        btn_draw = tk.Button(master=self, text="D:right", command=self.draw_arm_right, bg="red")
+        btn_draw = tk.Button(master=self, text="E:home", command=self.arm_home, bg="red")
         btn_draw.grid(row=1, column=2, sticky="nsew")
 
+        btn_down = tk.Button(master=self, text="A:left", command=self.draw_arm_left, bg="green")
+        btn_down.grid(row=2, column=0, sticky="nsew")
+
+        btn_left = tk.Button(master=self, text="S:DRAW", command=self.arm_draw, bg="green")
+        btn_left.grid(row=2, column=1, sticky="nsew")
+
+        btn_draw = tk.Button(master=self, text="D:right", command=self.draw_arm_right, bg="red")
+        btn_draw.grid(row=2, column=2, sticky="nsew")
+
         btn_right = tk.Button(master=self, text="Z:pen\nlift", command=self.pen_lift, bg="green")
-        btn_right.grid(row=2, column=0, sticky="nsew")
+        btn_right.grid(row=3, column=0, sticky="nsew")
 
         btn_right = tk.Button(master=self, text="X:back", command=self.draw_arm_bkwd, bg="green")
-        btn_right.grid(row=2, column=1, sticky="nsew")
+        btn_right.grid(row=3, column=1, sticky="nsew")
 
         btn_quit = tk.Button(master=self, text="C:pen\ndown", command=self.pen_down, bg="red")
-        btn_quit.grid(row=2, column=2, sticky="nsew")
+        btn_quit.grid(row=3, column=2, sticky="nsew")
 
     def create_sips(self):
         """joint_dict_pos = {'myLSS1': 0, 'myLSS2': 0, 'myLSS3': 0, 'myLSS4': 0, 'myLSS5': 0}"""
