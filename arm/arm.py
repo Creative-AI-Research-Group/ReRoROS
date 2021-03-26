@@ -11,7 +11,6 @@ It translates all the basic commands for drawing arm into LSS-class based code.
 # Import required libraries
 import time
 import random
-from pygame import mouse
 
 # Import LSS library
 import lss

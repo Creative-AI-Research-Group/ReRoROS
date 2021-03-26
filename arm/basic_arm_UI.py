@@ -1,4 +1,5 @@
-# import pynput
+# from pynput.mouse import Listener
+# from pynput import Key
 from arm import Arm
 from time import sleep
 import tkinter as tk
@@ -20,6 +21,14 @@ class ArmGUI(tk.Frame):
         self.gui.title("Arm Control")
         self.gui.geometry("700x500")
         self.gui.configure(background='light slate gray')
+
+        # binding events to tkinter
+        # listen for keyboard commands
+        self.gui.bind('<Key>', self.key_press)
+
+        # listen for mouse control
+        self.gui.bind('<B1-Motion>', self.draw_arm_mouse)
+        self.gui.bind('<B2-Motion>', self.move_arm_mouse)
 
         # Initialize the Frame
         tk.Frame.__init__(self, self.gui)
@@ -45,34 +54,34 @@ class ArmGUI(tk.Frame):
         btn_draw = tk.Button(master=self, text="3. close\nclaw", command=self.close_claw, bg="red")
         btn_draw.grid(row=0, column=2, sticky="nsew")
 
-        btn_up = tk.Button(master=self, text="W:fwd", command=self.draw_arm_fwd, bg="green")
+        btn_up = tk.Button(master=self, text="w:fwd", command=self.draw_arm_fwd, bg="green")
         btn_up.grid(row=1, column=1, sticky="nsew")
 
-        btn_down = tk.Button(master=self, text="A:left", command=self.draw_arm_left, bg="green")
+        btn_down = tk.Button(master=self, text="a:left", command=self.draw_arm_left, bg="green")
         btn_down.grid(row=2, column=0, sticky="nsew")
 
-        btn_left = tk.Button(master=self, text="S:DRAW", command=self.arm_draw, bg="green")
+        btn_left = tk.Button(master=self, text="s:DRAW", command=self.arm_draw, bg="green")
         btn_left.grid(row=2, column=1, sticky="nsew")
 
-        btn_draw = tk.Button(master=self, text="D:right", command=self.draw_arm_right, bg="red")
+        btn_draw = tk.Button(master=self, text="d:right", command=self.draw_arm_right, bg="red")
         btn_draw.grid(row=2, column=2, sticky="nsew")
 
-        btn_right = tk.Button(master=self, text="Z:pen\nlift", command=self.pen_lift, bg="green")
+        btn_right = tk.Button(master=self, text="z:pen\nlift", command=self.pen_lift, bg="green")
         btn_right.grid(row=3, column=0, sticky="nsew")
 
-        btn_right = tk.Button(master=self, text="X:back", command=self.draw_arm_bkwd, bg="green")
+        btn_right = tk.Button(master=self, text="x:back", command=self.draw_arm_bkwd, bg="green")
         btn_right.grid(row=3, column=1, sticky="nsew")
 
-        btn_quit = tk.Button(master=self, text="C:pen\ndown", command=self.pen_down, bg="red")
+        btn_quit = tk.Button(master=self, text="c:pen\ndown", command=self.pen_down, bg="red")
         btn_quit.grid(row=3, column=2, sticky="nsew")
 
-        btn_quit = tk.Button(master=self, text="Q:QUIT", command=self.terminate, bg="red")
+        btn_quit = tk.Button(master=self, text="Esc:quit", command=self.terminate, bg="red")
         btn_quit.grid(row=4, column=0, sticky="nsew")
 
-        btn_right = tk.Button(master=self, text="reset", command=self.reset, bg="green")
+        btn_right = tk.Button(master=self, text="r:reset", command=self.reset, bg="green")
         btn_right.grid(row=4, column=1, sticky="nsew")
 
-        btn_draw = tk.Button(master=self, text="E:home", command=self.arm_home, bg="red")
+        btn_draw = tk.Button(master=self, text="h:home", command=self.arm_home, bg="red")
         btn_draw.grid(row=4, column=2, sticky="nsew")
 
     def create_sips(self):
@@ -101,16 +110,50 @@ class ArmGUI(tk.Frame):
         self.create_sips()
 
         # look for mouse position
-        # mouse_pos = self.mouse_position()
+        # self.mouse_position()
 
         # move arm using mouse pos
         # parse arme movement here self.arm.draw(mouse_pos)
 
-        # watch for keyboard commands
-        # self.
 
         # "... and start all over again"
         self.after(self.UPDATE_RATE, self.updater)
+
+    def key_press(self, event):
+        key_pressed = event.keysym
+        print('{0} pressed'.format(event.keysym))
+        if key_pressed == '1':
+            self.draw_ready()
+        if key_pressed == '2':
+            self.open_claw()
+        if key_pressed == '3':
+            self.close_claw()
+        if key_pressed == 'w':
+            self.draw_arm_fwd()
+        if key_pressed == 'a':
+            self.draw_arm_left()
+        if key_pressed == 's':
+            self.arm_draw()
+        if key_pressed == 'd':
+            self.draw_arm_right()
+        if key_pressed == 'z':
+            self.pen_lift()
+        if key_pressed == 'x':
+            self.draw_arm_bkwd()
+        if key_pressed == 'c':
+            self.pen_down()
+        if key_pressed == 'Escape':
+            self.terminate()
+        if key_pressed == 'r':
+            self.reset()
+        if key_pressed == 'h':
+            self.arm_home()
+
+    def move_arm_mouse(self, event):
+        print(f'mouse 1 x={event.x}, y={event.y}')
+
+    def draw_arm_mouse(self, event):
+        print(f'mouse 2 x={event.x}, y={event.y}')
 
     # move arm fwd by 0.5 degree relative
     def draw_arm_fwd(self):
