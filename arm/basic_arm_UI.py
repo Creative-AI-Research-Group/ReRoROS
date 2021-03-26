@@ -134,8 +134,14 @@ class ArmGUI(tk.Frame):
     def draw_ready(self):
         self.arm.draw_ready()
 
+    def open_claw(self):
+        self.arm.open_claw()
+
+    def close_claw(self):
+        self.arm.close_claw()
+
     def arm_draw(self):
-        pass
+        self.arm.draw_ready()
 
     def keyboard_watcher(self):
         pass
