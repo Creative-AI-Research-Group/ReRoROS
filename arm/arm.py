@@ -35,7 +35,7 @@ class Arm:
         # Set standard positions - ABSOLUTES
         self.sleep_position_abs = [0, -900, 900, 0, 0]  # absolute arm position for hold
         self.draw_ready_abs = [0, -350, 450, 0, 0]  # waits
-        self.draw_in_position = [0, 30, 100, 700, 0]
+        self.draw_in_position = [0, -30, 100, 700, 0]
 
         # Set standard positions - RELATIVE
         self.open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to receive pen
@@ -184,6 +184,7 @@ class Arm:
 
 
     # animation functions while waiting
+    # todo
     def waiting_dance(self):
         while self.waiting:
             # get random vars
@@ -197,6 +198,7 @@ class Arm:
 
             # while not is_in_posiiton:
 
+    # todo
     def tracking_human_pencil_while_waiting(self):
         pass
 
@@ -218,7 +220,7 @@ class Arm:
             joint_dict = self.lss_list_str[i]
             self.joint_dict_pos[joint_dict] = pos
 
-    # calcs where nest position of arm should be
+    # calcs where next position of arm should be
     def is_in_position(self, position):
         pos_list = []
         pos_count = 0

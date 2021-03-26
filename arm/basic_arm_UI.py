@@ -19,7 +19,7 @@ class ArmGUI(tk.Frame):
         print('building arm GUI')
         self.gui = tk.Tk()
         self.gui.title("Arm Control")
-        self.gui.geometry("700x500")
+        self.gui.geometry("1400x1000")
         self.gui.configure(background='light slate gray')
 
         # binding events to tkinter
@@ -27,8 +27,10 @@ class ArmGUI(tk.Frame):
         self.gui.bind('<Key>', self.key_press)
 
         # listen for mouse control
-        self.gui.bind('<B1-Motion>', self.draw_arm_mouse)
-        self.gui.bind('<B2-Motion>', self.move_arm_mouse)
+        # left mouse button down and move = draw arm
+        # right mouse button down and move = move arm
+        self.gui.bind('<B2-Motion>', self.draw_arm_mouse)
+        self.gui.bind('<B1-Motion>', self.move_arm_mouse)
 
         # Initialize the Frame
         tk.Frame.__init__(self, self.gui)
@@ -41,7 +43,7 @@ class ArmGUI(tk.Frame):
         self.create_sips()
 
         # Start the updating cycle
-        self.updater()
+        self.ui_updater()
 
     def create_widgets(self):
         """create the interactive buttons"""
@@ -102,22 +104,15 @@ class ArmGUI(tk.Frame):
         label_LSS5 = tk.Label(master=self, text=f"myLSS5 position = {self.arm.joint_dict_pos['myLSS5']}")
         label_LSS5.grid(row=4, column=4)
 
-    def updater(self):
+    def ui_updater(self):
         # read incoming SIPS from LSS and parse to dict
         self.arm.get_positions()
 
         # refresh SIPS windows
         self.create_sips()
 
-        # look for mouse position
-        # self.mouse_position()
-
-        # move arm using mouse pos
-        # parse arme movement here self.arm.draw(mouse_pos)
-
-
         # "... and start all over again"
-        self.after(self.UPDATE_RATE, self.updater)
+        self.after(self.UPDATE_RATE, self.ui_updater)
 
     def key_press(self, event):
         key_pressed = event.keysym
@@ -151,6 +146,11 @@ class ArmGUI(tk.Frame):
 
     def move_arm_mouse(self, event):
         print(f'mouse 1 x={event.x}, y={event.y}')
+        # NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+
+        # # move x plane = joint 1
+        # self.arm.move_joint_speed(1)
+
 
     def draw_arm_mouse(self, event):
         print(f'mouse 2 x={event.x}, y={event.y}')
