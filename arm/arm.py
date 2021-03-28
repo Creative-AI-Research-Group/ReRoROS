@@ -35,7 +35,7 @@ class Arm:
         # Set standard positions - ABSOLUTES
         self.sleep_position_abs = [0, -900, 900, 0, 0]  # absolute arm position for hold
         self.draw_ready_abs = [0, -350, 450, 0, 0]  # waits
-        self.draw_in_position = [0, -30, 100, 700, 0]
+        self.draw_in_position = [0, -20, 100, 700, 0]
 
         # Set standard positions - RELATIVE
         self.open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to receive pen
@@ -80,6 +80,14 @@ class Arm:
                                'myLSS5': 0
                                }
 
+        # define joint dict for current load/current
+        self.joint_dict_current = {'myLSS1': 0,
+                               'myLSS2': 0,
+                               'myLSS3': 0,
+                               'myLSS4': 0,
+                               'myLSS5': 0
+                               }
+
         # define joint dict for next pos
         self.joint_dict_next_pos = {'myLSS1': 0,
                                'myLSS2': 0,
@@ -110,10 +118,10 @@ class Arm:
         for i, joint in enumerate(self.lss_list):
             joint.hold()
 
-    # move arm to abolsute pos or predefined pos
+    # move arm to absolute pos or predefined pos
     def move_arm(self, pos):
         for i, joint in enumerate(self.lss_list):
-            joint.move(pos)
+            joint.move(pos[i])
 
     # move joint to absolute position
     def move_joint(self, joint, pos):
@@ -123,7 +131,7 @@ class Arm:
     # move arm to relative pos with delta
     def move_arm_relative(self, delta):
         for i, joint in enumerate(self.lss_list):
-            joint.moveRelative(delta)
+            joint.moveRelative(delta[i])
 
     # move joint to relative pos with delta
     def move_joint_relative(self, joint, delta):
@@ -143,7 +151,7 @@ class Arm:
     # moves arm relative to delta, optional speed
     def move_arm_relative_speed(self, delta, speed=None):
         for i, joint in enumerate(self.lss_list):
-            joint.moveRelativeSpeed(delta, speed)
+            joint.moveRelativeSpeed(delta[i], speed)
 
     # moves joint relative to delta, optional speed
     def move_joint_relative_speed(self, joint, delta, speed=None):
@@ -204,13 +212,14 @@ class Arm:
 
     #### telemetry ####
     # reads the sips from LSS and get current position
-    def get_positions(self):
+    def get_telemetry(self):
         # Get the values from LSS
         if self.sips_logging:
             print("\r\nQuerying LSS...")
 
         for i, joint in enumerate(self.lss_list):
             pos = joint.getPosition()
+            load = joint.getCurrent()
             max_s = joint.getMaxSpeed()
             max_s_rpm = joint.getMaxSpeedRPM()
             if self.sips_logging:

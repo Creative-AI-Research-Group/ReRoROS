@@ -15,6 +15,10 @@ class ArmGUI(tk.Frame):
         # Create robot arm object
         self.arm = Arm()
 
+        # setup vars and consts
+        # lifts draw head off page until ready to draw (mouse bbutton)_
+        self.draw_offset = -10
+
         # Build GUI
         print('building arm GUI')
         self.gui = tk.Tk()
@@ -27,16 +31,16 @@ class ArmGUI(tk.Frame):
         self.gui.bind('<Key>', self.key_press)
 
         # listen for mouse control
-        # left mouse button down and move = draw arm
-        # right mouse button down and move = move arm
-        self.gui.bind('<B2-Motion>', self.draw_arm_mouse)
-        self.gui.bind('<B1-Motion>', self.move_arm_mouse)
+        self.gui.bind('<Motion>', self.move_arm_mouse)
+
+        # listen for left mouse button (to engage draw)
+        self.gui.bind('<Button-1>', self.draw_button_on)
 
         # Initialize the Frame
         tk.Frame.__init__(self, self.gui)
         self.grid()
         self.rowconfigure([0, 1, 2, 3, 4], minsize=100, weight=1)
-        self.columnconfigure([0, 1, 2, 3, 4], minsize=75, weight=1)
+        self.columnconfigure([0, 1, 2, 3, 5], minsize=75, weight=1)
 
         # Build buttons and SIPS reporting (telemetry feedback)
         self.create_widgets()
@@ -89,24 +93,41 @@ class ArmGUI(tk.Frame):
     def create_sips(self):
         """joint_dict_pos = {'myLSS1': 0, 'myLSS2': 0, 'myLSS3': 0, 'myLSS4': 0, 'myLSS5': 0}"""
 
+        # display joint positions
         label_LSS1 = tk.Label(master=self, text=f"myLSS1 position = {self.arm.joint_dict_pos['myLSS1']}")
-        label_LSS1.grid(row=0, column=4)
+        label_LSS1.grid(row=0, column=3)
 
         label_LSS2 = tk.Label(master=self, text=f"myLSS2 position = {self.arm.joint_dict_pos['myLSS2']}")
-        label_LSS2.grid(row=1, column=4)
+        label_LSS2.grid(row=1, column=3)
 
         label_LSS3 = tk.Label(master=self, text=f"myLSS3 position = {self.arm.joint_dict_pos['myLSS3']}")
-        label_LSS3.grid(row=2, column=4)
+        label_LSS3.grid(row=2, column=3)
 
         label_LSS4 = tk.Label(master=self, text=f"myLSS4 position = {self.arm.joint_dict_pos['myLSS4']}")
-        label_LSS4.grid(row=3, column=4)
+        label_LSS4.grid(row=3, column=3)
 
         label_LSS5 = tk.Label(master=self, text=f"myLSS5 position = {self.arm.joint_dict_pos['myLSS5']}")
+        label_LSS5.grid(row=4, column=3)
+
+        # display joint current/load
+        label_LSS1 = tk.Label(master=self, text=f"myLSS1 current = {self.arm.joint_dict_current['myLSS1']}")
+        label_LSS1.grid(row=0, column=4)
+
+        label_LSS2 = tk.Label(master=self, text=f"myLSS2 current = {self.arm.joint_dict_current['myLSS2']}")
+        label_LSS2.grid(row=1, column=4)
+
+        label_LSS3 = tk.Label(master=self, text=f"myLSS3 current = {self.arm.joint_dict_current['myLSS3']}")
+        label_LSS3.grid(row=2, column=4)
+
+        label_LSS4 = tk.Label(master=self, text=f"myLSS4 current = {self.arm.joint_dict_current['myLSS4']}")
+        label_LSS4.grid(row=3, column=4)
+
+        label_LSS5 = tk.Label(master=self, text=f"myLSS5 current = {self.arm.joint_dict_current['myLSS5']}")
         label_LSS5.grid(row=4, column=4)
 
     def ui_updater(self):
         # read incoming SIPS from LSS and parse to dict
-        self.arm.get_positions()
+        self.arm.get_telemetry()
 
         # refresh SIPS windows
         self.create_sips()
@@ -146,14 +167,38 @@ class ArmGUI(tk.Frame):
 
     def move_arm_mouse(self, event):
         print(f'mouse 1 x={event.x}, y={event.y}')
-        # NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+        lss1, lss2, lss3, lss4 = self.calc_arm_pos_trig(event.x, event.y)
 
-        # # move x plane = joint 1
-        # self.arm.move_joint_speed(1)
+        move_list = [lss1, lss2, lss3, lss4, 0]
+        self.arm.move_arm(move_list)
 
+    def calc_arm_pos_trig(self, x, y):
+        """x,y (top left = 0, 0) is opposite right corner of A4 page
+        lss1_x_min = 290 - 63
+        lss1_x_max = -73 - -420
+        lss2 = 590 - -470
+        lss3 = -740 - -520
+        lss4 = 1000 - 870
 
-    def draw_arm_mouse(self, event):
-        print(f'mouse 2 x={event.x}, y={event.y}')
+        NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+        """
+
+        lss2 = ((((y - 0) * (-470 - 590)) / (1400 - 0)) + 590) + self.draw_offset
+        lss3 = (((y - 0) * (-510 - -740)) / (1400 - 0)) + -740
+        lss4 = (((y - 0) * (870 - 1000)) / (1400 - 0)) + 1000
+
+        lss1_x_min = (((y - 0) * (63 - 290)) / (1400 - 0)) + 1000
+        lss1_x_max = (((y - 0) * (-420 - -73)) / (1400 - 0)) + 1000
+
+        lss1 = (((x - 0) * (lss1_x_max - lss1_x_min)) / (1400 - 0)) + 1000
+        
+        return lss1, lss2, lss3, lss4
+
+    def draw_button_on(self, event):
+        while event:
+            self.draw_offset = 0 # put draw head on page
+        else:
+            self.draw_offset = -10 # lifts draw head of page
 
     # move arm fwd by 0.5 degree relative
     def draw_arm_fwd(self):
@@ -192,13 +237,6 @@ class ArmGUI(tk.Frame):
     def reset(self):
         self.arm.reset_arm()
 
-    def keyboard_watcher(self):
-        pass
-
-    def mouse_position(self):
-        # pos = pynput.mouse.get_pos()
-        # return pos
-        pass
 
     def terminate(self):
         print('terminator!!!')
