@@ -228,6 +228,7 @@ class Arm:
 
             joint_dict = self.lss_list_str[i]
             self.joint_dict_pos[joint_dict] = pos
+            self.joint_dict_current[joint_dict] = load
 
     # calcs where next position of arm should be
     def is_in_position(self, position):
