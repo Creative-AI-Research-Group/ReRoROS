@@ -16,8 +16,8 @@ class ArmGUI(tk.Frame):
         self.arm = Arm()
 
         # setup vars and consts
-        # lifts draw head off page until ready to draw (mouse button)_
-        self.draw_offset = -10
+        # lifts draw head off page until ready to draw (space bar)_
+        self.lift_pen = -10
         # debug logging
         self.logging = True
         # detect if mouse is in frame
@@ -42,6 +42,7 @@ class ArmGUI(tk.Frame):
         # create a canvas for drawing
         # arm control blob
         self.img = tk.PhotoImage(file="data/200px-Light_Blue_Circle.svg.png")
+
         # create canvas
         self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height)
         self.canvas.grid(row=0, column=6, rowspan=5, columnspan=3)
@@ -53,6 +54,11 @@ class ArmGUI(tk.Frame):
 
         # listen for left mouse button (to engage draw)
         self.gui.bind('<B1-Motion>', self.paint)
+
+        # listen for keyboard commands
+        self.gui.bind('<space>', self.space_press_on)
+
+        # self.gui.bind('<space-release>', self.space_press_off)
 
         # Build buttons and SIPS reporting (telemetry feedback)
         self.create_widgets()
@@ -165,8 +171,9 @@ class ArmGUI(tk.Frame):
 
     def key_press(self, event):
         key_pressed = event.keysym
+        key_pressed.lower()
         if self.logging:
-            print('{0} pressed'.format(event.keysym))
+            print(f'{key_pressed} pressed')
         if key_pressed == '1':
             self.draw_ready()
         if key_pressed == '2':
@@ -193,10 +200,6 @@ class ArmGUI(tk.Frame):
             self.reset()
         if key_pressed == 'h':
             self.arm_home()
-        if key_pressed == ' ':
-            self.draw_offset = 10
-        else:
-            self.draw_offset = -10
 
     def paint(self, event):
         x1, y1 = (event.x - 1), (event.y - 1)
@@ -209,12 +212,20 @@ class ArmGUI(tk.Frame):
         self.canvas.create_oval(x1, y1, x2, y2, fill="Black")
         self.move_arm_mouse(event.x, event.y)
 
+    def space_press_on(self, event):
+        print(event)
+        # self.pen_lift = 10
+
+    def space_press_off(self, event):
+        print(event)
+        # self.pen_lift = -10
+
     def move_arm_mouse(self, x, y):
         if self.logging:
             print(f'mouse 1 x={x}, y={y}')
 
-        # FLIP TO MAKE IT PORTRAIT & get trig list
-        move_list = self.calc_arm_pos_trig(y, x)
+        # calc position change of each joint
+        move_list = self.calc_arm_pos_trig(x, y)
 
         # move arm
         self.draw(move_list)
@@ -229,28 +240,24 @@ class ArmGUI(tk.Frame):
 
         NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
         """
-        lss2 = ((((y - 0) * (-470 - 590)) / (1400 - 0)) + 590) + self.draw_offset
+        lss2 = ((((y - 0) * (-470 - 590)) / (1400 - 0)) + 590) + self.lift_pen
         lss3 = (((y - 0) * (-510 - -740)) / (1400 - 0)) + -740
         lss4 = (((y - 0) * (870 - 1000)) / (1400 - 0)) + 1000
 
+        # adjust x min-max params to compensate for y
         lss1_x_min = (((y - 0) * (63 - 290)) / (1400 - 0)) + 1000
         lss1_x_max = (((y - 0) * (-420 - -73)) / (1400 - 0)) + 1000
 
-        lss1 = (((x - 0) * (lss1_x_max - lss1_x_min)) / (1400 - 0)) + 1000
+        # lss1 = (((x - 0) * (lss1_x_max - lss2_x_min)) / (1400 - 0)) + 1000
+        lss1 = (((x - 0) * (-63 - 290)) / (1400 - 0)) + 1000
         if self.logging:
             print(f'lss1 pos = {lss1}, '
                   f'lss2 pos = {lss2}, '
                   f'lss3 pos = {lss3}, '
                   f'lss4 pos = {lss4}')
 
-        move_list = [0, int(lss2), int(lss3), int(lss4), 0]
+        move_list = [int(lss1), int(lss2), int(lss3), int(lss4), 0]
         return move_list
-
-    def draw_button_on(self, event):
-        while event:
-            self.draw_offset = 0 # put draw head on page
-        else:
-            self.draw_offset = -10 # lifts draw head of page
 
     # move arm fwd by 0.5 degree relative
     def draw_arm_fwd(self):
