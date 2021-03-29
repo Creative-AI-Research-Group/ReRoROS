@@ -134,8 +134,8 @@ class LSS:
     def __init__(self, id=0):
         self.servoID = id
 
-    ### Attributes
-    servoID = 0
+    # ### Attributes
+    # servoID = 0
 
     ### Functions
     # > Actions

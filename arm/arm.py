@@ -23,7 +23,7 @@ class Arm:
         print('Init robot arm')
 
         # Open constants
-        self.CST_LSS_Port = "/dev/cu.usbserial-AG4UPOC05" # Mac platform
+        self.CST_LSS_Port = "/dev/cu.usbserial-AG4UPOC0" # Mac platform
         # self.CST_LSS_Port = "/dev/ttyUSB0" # For Linux/Unix platforms
         # self.CST_LSS_Port = "COM230"  # For windows platforms
         self.CST_LSS_Baud = lssc.LSS_DefaultBaud
@@ -73,20 +73,12 @@ class Arm:
                          'myLSS5']
 
         # define joint dict for current position
-        self.joint_dict_pos = {'myLSS1': 0,
-                               'myLSS2': 0,
-                               'myLSS3': 0,
-                               'myLSS4': 0,
-                               'myLSS5': 0
-                               }
-
-        # define joint dict for current load/current
-        self.joint_dict_current = {'myLSS1': 0,
-                               'myLSS2': 0,
-                               'myLSS3': 0,
-                               'myLSS4': 0,
-                               'myLSS5': 0
-                               }
+        self.joint_dict = {'myLSS1': {'pos': 0, 'speed': 0, 'load': 0},
+                               'myLSS2': {'pos': 0, 'speed': 0, 'load': 0},
+                               'myLSS3': {'pos': 0, 'speed': 0, 'load': 0},
+                               'myLSS4': {'pos': 0, 'speed': 0, 'load': 0},
+                               'myLSS5': {'pos': 0, 'speed': 0, 'load': 0}
+                           }
 
         # define joint dict for next pos
         self.joint_dict_next_pos = {'myLSS1': 0,
@@ -188,9 +180,6 @@ class Arm:
             joint.moveSpeed(self.draw_in_position[i], 20)
 
 
-    # todo something complex with x, y mouse pos into 5 dof robot arm HAHA!!
-
-
     # animation functions while waiting
     # todo
     def waiting_dance(self):
@@ -220,15 +209,15 @@ class Arm:
         for i, joint in enumerate(self.lss_list):
             pos = joint.getPosition()
             load = joint.getCurrent()
-            max_s = joint.getMaxSpeed()
-            max_s_rpm = joint.getMaxSpeedRPM()
+            speed = joint.getSpeed()
             if self.sips_logging:
                 print(f"Position  {joint} (1/10 deg) = ", str(pos))
-                print(f'max speed = {max_s}; max speed RPMM = {max_s_rpm}')
+                print(f'speed = {speed}; load/current = {load}')
 
             joint_dict = self.lss_list_str[i]
-            self.joint_dict_pos[joint_dict] = pos
-            self.joint_dict_current[joint_dict] = load
+            self.joint_dict[joint_dict]['pos'] = pos
+            self.joint_dict[joint_dict]['speed'] = speed
+            self.joint_dict[joint_dict]['load'] = load
 
     # calcs where next position of arm should be
     def is_in_position(self, position):
