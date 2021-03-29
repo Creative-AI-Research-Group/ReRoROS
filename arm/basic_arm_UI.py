@@ -40,20 +40,16 @@ class ArmGUI(tk.Frame):
         self.columnconfigure([0, 1, 2, 3, 4, 5, 6, 7, 8], minsize=75, weight=1)
 
         # create a canvas for drawing
+        # arm control blob
+        self.img = tk.PhotoImage(file="data/200px-Light_Blue_Circle.svg.png")
         # create canvas
         self.canvas = tk.Canvas(self, width=self.canvas_width, height=self.canvas_height)
         self.canvas.grid(row=0, column=6, rowspan=5, columnspan=3)
-
+        self.cimg = self.canvas.create_image(300, 450, image=self.img)
 
         # binding events to tkinter
         # listen for keyboard commands
         self.gui.bind('<Key>', self.key_press)
-
-        # # listen for mouse in frame
-        # self.gui.bind('<Enter>', self.mouse_state)
-        #
-        # # listen for mouse control
-        # self.gui.bind('<Motion>', self.move_arm_mouse)
 
         # listen for left mouse button (to engage draw)
         self.gui.bind('<B1-Motion>', self.paint)
@@ -197,19 +193,21 @@ class ArmGUI(tk.Frame):
             self.reset()
         if key_pressed == 'h':
             self.arm_home()
+        if key_pressed == ' ':
+            self.draw_offset = 10
+        else:
+            self.draw_offset = -10
 
     def paint(self, event):
         x1, y1 = (event.x - 1), (event.y - 1)
         x2, y2 = (event.x + 1), (event.y + 1)
+
+        # draw control blob
+        self.canvas.coords(self.cimg, event.x, event.y)
+
+        # draw tracers
         self.canvas.create_oval(x1, y1, x2, y2, fill="Black")
         self.move_arm_mouse(event.x, event.y)
-
-    def mouse_state(self, event):
-        print('############################ ', event.focus)
-        if event.focus:
-            self.ui_mouse_enter = True
-        else:
-            self.ui_mouse_enter = False
 
     def move_arm_mouse(self, x, y):
         if self.logging:
