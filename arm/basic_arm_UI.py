@@ -16,7 +16,7 @@ class ArmGUI(tk.Frame):
         self.arm = Arm()
 
         # setup vars and consts
-        # lifts draw head off page until ready to draw (space bar)_
+        # lifts draw head off page until ready to draw (space bar)
         self.lift_pen = -10
         # debug logging
         self.logging = True

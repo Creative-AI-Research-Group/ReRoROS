@@ -59,7 +59,12 @@ class Arm:
         self.allMotors = lss.LSS(254)
 
         # Instantiate an IK object for complex arm moves
-        self.IK = IK_move(self.base, self.shoulder, self.elbow, self.wrist, self.gripper, self.allMotors)
+        self.IK = IK_move(self.base,
+                          self.shoulder,
+                          self.elbow,
+                          self.wrist,
+                          self.gripper,
+                          self.allMotors)
 
         # Set safety params (it seems these are ignored by arm OS when using moveSpeed
         self.allMotors.setAngularHoldingStiffness(0)
@@ -176,10 +181,9 @@ class Arm:
             joint.moveSpeed(self.sleep_position_abs[i], 50)
         self.hold()
 
-    def draw(self):
-        for i, joint in enumerate(self.lss_list):
-            joint.moveSpeed(self.draw_in_position[i], 20)
-
+    def draw(self, x, y):
+        move = [x, y]
+        self.IK.executeMove(move)
 
     # animation functions while waiting
     # todo
