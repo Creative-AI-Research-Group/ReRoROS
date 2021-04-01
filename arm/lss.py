@@ -28,24 +28,39 @@ def closeBus():
         LSS.bus.close()
         del LSS.bus
 
-
-# Write with an optional parameter and possibly an optional modifier & parameter
-def genericWrite(id, cmd, param=None, mod=None, modParam=None):
+# Write with optional parameter and modifiers (from GeraldineBC)
+def genericWrite(id, cmd, param = None, mod = None, value = None, mod2 = None, val2 = None):
     if LSS.bus is None:
         return False
-    # Assuming modifiers always need a parameter
-    if (mod is None) or (modParam is None):
-        cmdStr = ""
+    if mod is None:
+        if param is None:
+            LSS.bus.write((lssc.LSS_CommandStart + str(id) + cmd + lssc.LSS_CommandEnd).encode())
+        else:
+            LSS.bus.write((lssc.LSS_CommandStart + str(id) + cmd + str(param) + lssc.LSS_CommandEnd).encode())
     else:
-        cmdStr = mod + str(modParam)
-    if (param is None):
-        cmdStr = cmd + cmdStr
-    else:
-        cmdStr = cmd + str(param) + cmdStr
-    # Add header, ID and footer and send to bus
-    cmdStr = "{}{}{}{}".format(lssc.LSS_CommandStart, str(id), cmdStr, lssc.LSS_CommandEnd)
-    LSS.bus.write(cmdStr.encode())
+        if mod2 is None:
+            LSS.bus.write((lssc.LSS_CommandStart + str(id) + cmd + str(param) + mod + str(value) + lssc.LSS_CommandEnd).encode())
+        else:
+            LSS.bus.write((lssc.LSS_CommandStart + str(id) + cmd + str(param) + mod + str(value) + mod2 + str(val2) + lssc.LSS_CommandEnd).encode())
     return True
+
+## Write with an optional parameter and possibly an optional modifier & parameter
+# def genericWrite(id, cmd, param=None, mod=None, modParam=None):
+#     if LSS.bus is None:
+#         return False
+#     # Assuming modifiers always need a parameter
+#     if (mod is None) or (modParam is None):
+#         cmdStr = ""
+#     else:
+#         cmdStr = mod + str(modParam)
+#     if (param is None):
+#         cmdStr = cmd + cmdStr
+#     else:
+#         cmdStr = cmd + str(param) + cmdStr
+#     # Add header, ID and footer and send to bus
+#     cmdStr = "{}{}{}{}".format(lssc.LSS_CommandStart, str(id), cmdStr, lssc.LSS_CommandEnd)
+#     LSS.bus.write(cmdStr.encode())
+#     return True
 
 
 # Read an integer result
@@ -135,7 +150,7 @@ class LSS:
         self.servoID = id
 
     # ### Attributes
-    # servoID = 0
+    servoID = 0
 
     ### Functions
     # > Actions
@@ -165,6 +180,19 @@ class LSS:
 
     def moveRelativeSpeed(self, delta, speed):
         return (genericWrite(self.servoID, lssc.LSS_ActionMoveRelative, delta, lssc.LSS_ActionMaxSpeed, speed))
+
+    def moveT(self, pos, value):
+        return (genericWrite(self.servoID, lssc.LSS_ActionMove, pos, lssc.LSS_ActionParameterTime, value))
+
+    def moveCH(self, pos, value):
+        return (genericWrite(self.servoID, lssc.LSS_ActionMove, pos, lssc.LSS_ModifierCurrentHaltHold, value))
+
+    def moveCHT(self, pos, value, tval):
+        return (genericWrite(self.servoID, lssc.LSS_ActionMove, pos, lssc.LSS_ModifierCurrentHaltHold, value,
+                             lssc.LSS_ActionParameterTime, tval))
+
+    def moveCL(self, pos, value):
+        return (genericWrite(self.servoID, lssc.LSS_ActionMove, pos, lssc.LSS_ModifierCurrentLimp, value))
 
     # > Queries
     # def getID(self):

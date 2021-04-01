@@ -8,13 +8,16 @@
 """This class is a handler and interfaces between the GUI and the LSS clasess supplied by Lynxmotio.
 It translates all the basic commands for drawing arm into LSS-class based code.
 """
+
 # Import required libraries
 import time
 import random
+import platform
 
 # Import LSS library
 import lss
 import lss_const as lssc
+from arm_control import IK_move
 
 
 class Arm:
@@ -23,10 +26,16 @@ class Arm:
         print('Init robot arm')
 
         # Open constants
-        self.CST_LSS_Port = "/dev/cu.usbserial-AG4UPOC0" # Mac platform
-        # self.CST_LSS_Port = "/dev/ttyUSB0" # For Linux/Unix platforms
-        # self.CST_LSS_Port = "COM230"  # For windows platforms
+        if platform.system() == 'Windows':
+            port = "COM3"
+        elif platform.system() == 'Linux':
+            port = "/dev/ttyUSB0"
+        else:
+            self.CST_LSS_Port = "/dev/cu.usbserial-AG4UPOC0" # Mac
+
         self.CST_LSS_Baud = lssc.LSS_DefaultBaud
+        self.CST_ANGLE_MIN = -90
+        self.CST_ANGLE_MAX = 90
 
         # Create and open a serial port
         lss.initBus(self.CST_LSS_Port, self.CST_LSS_Baud)
@@ -41,52 +50,44 @@ class Arm:
         self.open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to receive pen
         self.hold_pen_rel = [0, 0, 0, 0, 0]  # closes claw for pen
 
-
-        # define safety params
-        self.my_max_speed = 100
-
         # Create LSS objects
-        self.myLSS1 = lss.LSS(1)
-        self.myLSS2 = lss.LSS(2)
-        self.myLSS3 = lss.LSS(3)
-        self.myLSS4 = lss.LSS(4)
-        self.myLSS5 = lss.LSS(5)
+        self.base = lss.LSS(1)
+        self.shoulder = lss.LSS(2)
+        self.elbow = lss.LSS(3)
+        self.wrist = lss.LSS(4)
+        self.gripper = lss.LSS(5)
+        self.allMotors = lss.LSS(254)
+
+        # Instantiate an IK object for complex arm moves
+        self.IK = IK_move(self.base, self.shoulder, self.elbow, self.wrist, self.gripper, self.allMotors)
 
         # Set safety params (it seems these are ignored by arm OS when using moveSpeed
-        self.myLSS1.setMaxSpeed(self.my_max_speed, lssc.LSS_SetConfig)
-        self.myLSS2.setMaxSpeed(self.my_max_speed, lssc.LSS_SetConfig)
-        self.myLSS3.setMaxSpeed(self.my_max_speed, lssc.LSS_SetConfig)
-        self.myLSS4.setMaxSpeed(self.my_max_speed, lssc.LSS_SetConfig)
-        self.myLSS5.setMaxSpeed(self.my_max_speed, lssc.LSS_SetConfig)
+        self.allMotors.setAngularHoldingStiffness(0)
+        self.allMotors.setMaxSpeed(100)
+        self.base.setMaxSpeed(60)
+        self.shoulder.setMotionControlEnabled(0)
+        self.elbow.setMotionControlEnabled(0)
 
         # define joint list
-        self.lss_list = [self.myLSS1,
-                         self.myLSS2,
-                         self.myLSS3,
-                         self.myLSS4,
-                         self.myLSS5]
+        self.lss_list = [self.base,
+                         self.shoulder,
+                         self.elbow,
+                         self.wrist,
+                         self.gripper]
 
-        self.lss_list_str = ['myLSS1',
-                         'myLSS2',
-                         'myLSS3',
-                         'myLSS4',
-                         'myLSS5']
+        self.lss_list_str = ['base',
+                         'shoulder',
+                         'elbow',
+                         'wrist',
+                         'gripper']
 
         # define joint dict for current position
-        self.joint_dict = {'myLSS1': {'pos': 0, 'speed': 0, 'load': 0},
-                               'myLSS2': {'pos': 0, 'speed': 0, 'load': 0},
-                               'myLSS3': {'pos': 0, 'speed': 0, 'load': 0},
-                               'myLSS4': {'pos': 0, 'speed': 0, 'load': 0},
-                               'myLSS5': {'pos': 0, 'speed': 0, 'load': 0}
+        self.joint_dict = {'base': {'pos': 0, 'speed': 0, 'load': 0},
+                               'shoulder': {'pos': 0, 'speed': 0, 'load': 0},
+                               'elbow': {'pos': 0, 'speed': 0, 'load': 0},
+                               'wrist': {'pos': 0, 'speed': 0, 'load': 0},
+                               'gripper': {'pos': 0, 'speed': 0, 'load': 0}
                            }
-
-        # define joint dict for next pos
-        self.joint_dict_next_pos = {'myLSS1': 0,
-                               'myLSS2': 0,
-                               'myLSS3': 0,
-                               'myLSS4': 0,
-                               'myLSS5': 0
-                               }
 
         # Instance params
         self.waiting = False
@@ -242,11 +243,11 @@ class Arm:
         self.reset_arm()
 
         # Destroy objects
-        del self.myLSS1
-        del self.myLSS2
-        del self.myLSS3
-        del self.myLSS4
-        del self.myLSS5
+        del self.base
+        del self.shoulder
+        del self.elbow
+        del self.wrist
+        del self.gripper
 
         # Destroy the bus
         lss.closeBus()

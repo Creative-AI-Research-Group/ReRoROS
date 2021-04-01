@@ -19,6 +19,7 @@ class GUI(tk.Frame):
 
     # defining global vars
     UPDATE_RATE = 100 # millisecs
+    SIPS_LOGGING = False
 
     def __init__(self):
         # Create robot move object and Comms inheritance
@@ -39,7 +40,8 @@ class GUI(tk.Frame):
 
         # Build buttons and SIPPS reporting
         self.create_widgets()
-        self.create_sips()
+        if self.SIPS_LOGGING:
+            self.create_sips()
 
         # Start the updating cycle
         self.updater()
@@ -81,14 +83,15 @@ class GUI(tk.Frame):
         label_right_wheel.grid(row=4, column=4)
 
     def updater(self):
-        # send SIP request
-        self.robot.motor.send_sip_request()
+        if self.SIPS_LOGGING:
+            # send SIP request
+            self.robot.motor.send_sip_request()
 
-        # read incoming SIPS from client robot
-        self.robot.motor.parse_sip()
+            # read incoming SIPS from client robot
+            self.robot.motor.parse_sip()
 
-        # refresh SIPS windows
-        self.create_sips()
+            # refresh SIPS windows
+            self.create_sips()
 
         # send a heartbeat pulse
         self.robot.motor.pulse()
