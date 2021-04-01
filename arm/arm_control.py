@@ -51,7 +51,7 @@ class IK_move:
         self.CST_ANGLE_MIN = -90
         self.CST_ANGLE_MAX = 90
 
-        # toggle checking arrived anmd issue management
+        # toggle checking arrived and issue management
         self.checking = False
 
     # checks if results are in range

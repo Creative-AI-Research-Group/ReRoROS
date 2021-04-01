@@ -22,7 +22,6 @@ def initBus(portName, portBaud):
     LSS.bus = serial.Serial(portName, portBaud)
     LSS.bus.timeout = 0.1
 
-
 def closeBus():
     if LSS.bus is not None:
         LSS.bus.close()
@@ -156,6 +155,9 @@ class LSS:
     # > Actions
     def reset(self):
         return (genericWrite(self.servoID, lssc.LSS_ActionReset))
+
+    def confirm(self):
+        return (genericWrite(self.servoID, lssc.LSS_ActionConfirm))
 
     def limp(self):
         return (genericWrite(self.servoID, lssc.LSS_ActionLimp))
@@ -381,5 +383,9 @@ class LSS:
 
     def setBlinkingLED(self, state):
         return (genericWrite(self.servoID, lssc.LSS_ConfigBlinkingLED, state))
+
+    def setFilterPositionCount(self, value):
+        return (genericWrite(self.servoID, lssc.LSS_FilterPositionCount, value))
+
 
 ### EOF #######################################################################

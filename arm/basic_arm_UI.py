@@ -16,12 +16,9 @@ class ArmGUI(tk.Frame):
         self.arm = Arm()
 
         # setup vars and consts
-        # lifts draw head off page until ready to draw (space bar)
-        self.lift_pen = -10
         # debug logging
         self.logging = True
-        # detect if mouse is in frame
-        self.ui_mouse_enter = False
+
         # canvas dims
         self.canvas_width = 750
         self.canvas_height = 900
@@ -50,13 +47,14 @@ class ArmGUI(tk.Frame):
 
         # binding events to tkinter
         # listen for keyboard commands
-        self.gui.bind('<Key>', self.key_press)
+        self.gui.bind('<KeyPress>', self.key_press)
+        self.gui.bind('<KeyRelease>', self.key_release)
 
         # listen for left mouse button (to engage draw)
         self.gui.bind('<B1-Motion>', self.paint)
 
-        # listen for keyboard commands
-        self.gui.bind('<space>', self.space_press_on)
+        # # listen for keyboard commands
+        # self.gui.bind('<space>', self.space_press_on)
 
         # self.gui.bind('<space-release>', self.space_press_off)
 
@@ -69,7 +67,7 @@ class ArmGUI(tk.Frame):
 
     def create_widgets(self):
         """create the interactive buttons"""
-        btn_quit = tk.Button(master=self, text="1:ready", command=self.draw_ready, bg="red")
+        btn_quit = tk.Button(master=self, text="1:ready", command=self.draw_ready_pos, bg="red")
         btn_quit.grid(row=0, column=0, sticky="nsew")
 
         btn_up = tk.Button(master=self, text="2.open\nclaw", command=self.open_claw, bg="green")
@@ -84,20 +82,20 @@ class ArmGUI(tk.Frame):
         btn_down = tk.Button(master=self, text="a:left", command=self.draw_arm_left, bg="green")
         btn_down.grid(row=2, column=0, sticky="nsew")
 
-        btn_left = tk.Button(master=self, text="s:DRAW", command=self.arm_draw, bg="green")
+        btn_left = tk.Button(master=self, text="s:DRAW", command=self.draw_ready_pos, bg="green")
         btn_left.grid(row=2, column=1, sticky="nsew")
 
         btn_draw = tk.Button(master=self, text="d:right", command=self.draw_arm_right, bg="red")
         btn_draw.grid(row=2, column=2, sticky="nsew")
 
-        btn_right = tk.Button(master=self, text="z:pen\nlift", command=self.pen_lift, bg="green")
-        btn_right.grid(row=3, column=0, sticky="nsew")
+        # btn_right = tk.Button(master=self, text="z:draw\nmode", command=self.draw_mode, bg="green")
+        # btn_right.grid(row=3, column=0, sticky="nsew")
 
         btn_right = tk.Button(master=self, text="x:back", command=self.draw_arm_bkwd, bg="green")
         btn_right.grid(row=3, column=1, sticky="nsew")
 
-        btn_quit = tk.Button(master=self, text="c:pen\ndown", command=self.pen_down, bg="red")
-        btn_quit.grid(row=3, column=2, sticky="nsew")
+        # btn_quit = tk.Button(master=self, text="c:arm\nmode", command=self.arm_mode, bg="red")
+        # btn_quit.grid(row=3, column=2, sticky="nsew")
 
         btn_quit = tk.Button(master=self, text="Esc:quit", command=self.terminate, bg="red")
         btn_quit.grid(row=4, column=0, sticky="nsew")
@@ -169,13 +167,19 @@ class ArmGUI(tk.Frame):
         # "... and start all over again"
         self.after(self.UPDATE_RATE, self.ui_updater)
 
+    def key_release(self, event):
+        key_released = event.keysym
+        if key_released == 'Shift':
+            self.arm.pen_drawing_status = False
+            self.arm.led_blue()
+
     def key_press(self, event):
         key_pressed = event.keysym
         key_pressed.lower()
         if self.logging:
             print(f'{key_pressed} pressed')
         if key_pressed == '1':
-            self.draw_ready()
+            self.draw_ready_pos()
         if key_pressed == '2':
             self.open_claw()
         if key_pressed == '3':
@@ -185,21 +189,22 @@ class ArmGUI(tk.Frame):
         if key_pressed == 'a':
             self.draw_arm_left()
         if key_pressed == 's':
-            self.arm_draw()
+            self.arm_home()
         if key_pressed == 'd':
             self.draw_arm_right()
-        if key_pressed == 'z':
-            self.pen_lift()
+        # if key_pressed == 'z':
+        #     self.draw_mode()
         if key_pressed == 'x':
             self.draw_arm_bkwd()
-        if key_pressed == 'c':
-            self.pen_down()
+        # if key_pressed == 'c':
+        #     self.arm_mode()
         if key_pressed == 'Escape':
             self.terminate()
         if key_pressed == 'r':
             self.reset()
-        if key_pressed == 'h':
-            self.arm_home()
+        if key_pressed == 'Shift':
+            self.arm.pen_drawing_status = True
+            self.arm.led_red()
 
     def paint(self, event):
         x1, y1 = (event.x - 1), (event.y - 1)
@@ -210,54 +215,25 @@ class ArmGUI(tk.Frame):
 
         # draw tracers
         self.canvas.create_oval(x1, y1, x2, y2, fill="Black")
-        self.move_arm_mouse(event.x, event.y)
 
-    def space_press_on(self, event):
-        print(event)
-        # self.pen_lift = 10
-
-    def space_press_off(self, event):
-        print(event)
-        # self.pen_lift = -10
-
-    def move_arm_mouse(self, x, y):
         if self.logging:
-            print(f'mouse 1 x={x}, y={y}')
+            print(f'mouse 1 x={event.x}, y={event.y}')
 
-        # calc position change of each joint
-        move_list = self.calc_arm_pos_trig(x, y)
+        if self.arm.draw_mode_status:
+            # move arm using blue dot if selected
+            self.arm.executeMove([event.x, event.y])
 
-        # move arm
-        self.draw(move_list)
+    def shift_press_on(self, event):
+        print(event)
+        self.pen_offset = False
+        if self.arm.draw_mode_status:
+            self.arm.led_red()
 
-    def calc_arm_pos_trig(self, x, y):
-        """x,y (top left = 0, 0) is opposite right corner of A4 page
-        lss1_x_min = 290 - 63
-        lss1_x_max = -73 - -420
-        lss2 = 590 - -470
-        lss3 = -740 - -520
-        lss4 = 1000 - 870
-
-        NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-        """
-        lss2 = ((((y - 0) * (-470 - 590)) / (1400 - 0)) + 590) + self.lift_pen
-        lss3 = (((y - 0) * (-510 - -740)) / (1400 - 0)) + -740
-        lss4 = (((y - 0) * (870 - 1000)) / (1400 - 0)) + 1000
-
-        # adjust x min-max params to compensate for y
-        lss1_x_min = (((y - 0) * (63 - 290)) / (1400 - 0)) + 1000
-        lss1_x_max = (((y - 0) * (-420 - -73)) / (1400 - 0)) + 1000
-
-        # lss1 = (((x - 0) * (lss1_x_max - lss2_x_min)) / (1400 - 0)) + 1000
-        lss1 = (((x - 0) * (-63 - 290)) / (1400 - 0)) + 1000
-        if self.logging:
-            print(f'lss1 pos = {lss1}, '
-                  f'lss2 pos = {lss2}, '
-                  f'lss3 pos = {lss3}, '
-                  f'lss4 pos = {lss4}')
-
-        move_list = [int(lss1), int(lss2), int(lss3), int(lss4), 0]
-        return move_list
+    def shift_press_off(self, event):
+        print(event)
+        self.pen_offset = True
+        if self.arm.draw_mode_status:
+            self.arm.led_blue()
 
     # move arm fwd by 0.5 degree relative
     def draw_arm_fwd(self):
@@ -273,6 +249,7 @@ class ArmGUI(tk.Frame):
         self.arm.move_joint_relative_speed(1, -5, 20)
 
     def arm_home(self):
+        self.arm.led_green()
         self.arm.home()
 
     def pen_lift(self):
@@ -281,8 +258,17 @@ class ArmGUI(tk.Frame):
     def pen_down(self):
         self.arm.move_joint_relative_speed(4, 5, 20)
 
-    def draw_ready(self):
+    def draw_ready_pos(self):
         self.arm.draw_ready()
+        self.arm.draw_mode_status = True
+        self.arm.first_draw_move = True
+        self.arm.pen_drawing_status = False
+
+        # put blue dot in centre of screen (draw ready pos)
+        self.canvas.coords(self.cimg, 300, 450)
+
+        # LED's ready
+        self.arm.led_blue()
 
     def open_claw(self):
         self.arm.move_joint_relative_speed(5, -140, 20)
@@ -290,15 +276,8 @@ class ArmGUI(tk.Frame):
     def close_claw(self):
         self.arm.move_joint_relative_speed(5, 140, 20)
 
-    def arm_draw(self):
-        self.arm.draw()
-
-    def draw(self, pos_list):
-        self.arm.move_arm_speed(pos_list, 20)
-
     def reset(self):
         self.arm.reset_arm()
-
 
     def terminate(self):
         self.arm_home()

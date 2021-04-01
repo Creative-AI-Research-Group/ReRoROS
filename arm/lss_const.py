@@ -95,6 +95,7 @@ LSS_LED_White = 7
 
 # Commands - actions
 LSS_ActionReset = "RESET"
+LSS_ActionConfirm = "CONFIRM"
 LSS_ActionLimp = "L"
 LSS_ActionHold = "H"
 LSS_ActionParameterTime = "T"
@@ -111,6 +112,10 @@ LSS_ActionMaxSpeed = "SD"
 LSS_ActionMaxSpeedRPM = "SR"
 LSS_ActionColorLED = "LED"
 LSS_ActionGyreDirection = "G"
+
+# Commands - modifiers
+LSS_ModifierCurrentHaltHold = "CH"
+LSS_ModifierCurrentLimp = "CL"
 
 # Commands - actions advanced settings
 LSS_ActionAngularStiffness = "AS"
@@ -168,5 +173,8 @@ LSS_ConfigAngularHoldingStiffness = "CAH"
 LSS_ConfigAngularAcceleration = "CAA"
 LSS_ConfigAngularDeceleration = "CAD"
 LSS_ConfigBlinkingLED = "CLB"
+
+# extra command from GeraldineBC
+LSS_FilterPositionCount = "FPC"
 
 ### EOF #######################################################################
