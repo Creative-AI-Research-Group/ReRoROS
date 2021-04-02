@@ -203,10 +203,6 @@ class Arm:
             joint.moveSpeed(self.sleep_position_abs[i], 50)
         self.hold()
 
-    # def draw(self, x, y):
-    #     move = [x, y]
-    #     self.IK.executeMove(move)
-
     # animation functions while waiting
     # todo
     def waiting_dance(self):
@@ -497,7 +493,7 @@ class Arm:
         if self.pen_drawing_status:
             z = pen_height
         else:
-            z = pen_height + 2 # inch
+            z = pen_height + 1 # inch
 
         # move arm to ...
         x, y = move[0], move[1]
@@ -524,9 +520,6 @@ class Arm:
 
         arrived = self.LSSA_moveMotors(angles_BSEWG)
         # self.askPermision(angles_BSEWG2, arrived2, issue2, homography, cap, selectedCam)
-
-        # # make old x&y
-        # x0, y0 = x, y
 
 if __name__ == "__main__":
     bot_arm = Arm()
