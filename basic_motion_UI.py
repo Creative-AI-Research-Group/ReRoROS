@@ -68,16 +68,16 @@ class GUI(tk.Frame):
 
         # gripper control
         btn_gpr_up = tk.Button(master=self, text="gripper\nup", command=self.robot.gripper_up, bg="blue")
-        btn_gpr_up.grid(row=1, column=0, sticky="nsew")
+        btn_gpr_up.grid(row=1, column=3, sticky="nsew")
 
         btn_pad_open = tk.Button(master=self, text="paddle\nopen", command=self.robot.paddle_open, bg="yellow")
-        btn_pad_open.grid(row=1, column=1, sticky="nsew")
+        btn_pad_open.grid(row=2, column=3, sticky="nsew")
 
         btn_pad_close = tk.Button(master=self, text="paddle\nclose", command=self.robot.paddle_close, bg="yellow")
-        btn_pad_close.grid(row=1, column=2, sticky="nsew")
+        btn_pad_close.grid(row=3, column=3, sticky="nsew")
 
         btn_gpr_down = tk.Button(master=self, text="gripper\ndown", command=self.robot.gripper_down, bg="blue")
-        btn_gpr_down.grid(row=2, column=2, sticky="nsew")
+        btn_gpr_down.grid(row=4, column=3, sticky="nsew")
 
 
     def create_sips(self):
