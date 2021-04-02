@@ -58,20 +58,12 @@ class Arm:
         self.gripper = lss.LSS(5)
         self.allMotors = lss.LSS(254)
 
-        # # Instantiate an IK object for complex arm moves
-        # self.IK = IK_move(self.base,
-        #                   self.shoulder,
-        #                   self.elbow,
-        #                   self.wrist,
-        #                   self.gripper,
-        #                   self.allMotors)
-
         # Set stiffness (0= floppy joints which means less jitter at stop)
         self.allMotors.setAngularHoldingStiffness(0)
 
         # set max speed
-        self.allMotors.setMaxSpeed(100)
-        self.base.setMaxSpeed(60)
+        self.allMotors.setMaxSpeed(50)
+        self.base.setMaxSpeed(40)
 
         # allow spaming of positions to joint
         self.shoulder.setMotionControlEnabled(0)
@@ -84,11 +76,11 @@ class Arm:
                          self.wrist,
                          self.gripper]
 
-        self.lss_list_str = ['base',
-                         'shoulder',
-                         'elbow',
-                         'wrist',
-                         'gripper']
+        self.lss_list_str = ['gripper',
+                             'wrist',
+                             'elbow',
+                             'shoulder',
+                             'base']
 
         # define joint dict for current position
         self.joint_dict = {'base': {'pos': 0, 'speed': 0, 'load': 0},
@@ -243,6 +235,7 @@ class Arm:
             self.joint_dict[joint_dict]['load'] = load
 
     # calcs where next position of arm should be
+    # todo look at ar_motion solution for 'arrived'
     def is_in_position(self, position):
         pos_list = []
         pos_count = 0
