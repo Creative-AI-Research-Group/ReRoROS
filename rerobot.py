@@ -35,6 +35,43 @@ class Robot:
     def terminate(self):
         self.motor.terminate()
 
+    # gripper commands
+    # https://www.macalester.edu/research/fox/pioneer/gripmanP2.pdf
+    # cmd code = 33
+    # grppr argumenst:
+        # 1 - open paddles
+        # 2 - close paddles
+        # 3 - stop paddles
+        # 4 - lift up
+        # 5 - lift down
+        # 6 - stop lift
+
+    def gripper_up(self):
+        self.motor.cmd(self.motor.GRIPPER, value=4)
+        sleep(0.5)
+        self.gripper_stop()
+
+    def gripper_down(self):
+        self.motor.cmd(self.motor.GRIPPER, value=5)
+        sleep(0.5)
+        self.gripper_stop()
+
+    def gripper_stop(self):
+        self.motor.cmd(self.motor.GRIPPER, value=6)
+
+    def paddle_open(self):
+        self.motor.cmd(self.motor.GRIPPER, value=1)
+        sleep(0.5)
+        self.paddle_stop()
+
+    def paddle_close(self):
+        self.motor.cmd(self.motor.GRIPPER, value=2)
+        sleep(0.5)
+        self.paddle_stop()
+
+    def paddle_stop(self):
+        self.motor.cmd(self.motor.GRIPPER, value=3)
+
     # useful UI commands
     def step_forward(self):
         self.nudge(10)
@@ -83,5 +120,3 @@ class Robot:
         self.motor.left = speed
         self.motor.right = -speed
         self.move()
-
-

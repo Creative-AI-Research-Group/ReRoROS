@@ -47,6 +47,7 @@ class Comms:
     # increments.
     VEL2 = 32
     GRIPPER = 33
+    GRIPPERIOREQUEST = 37 # Request one (1), a continuous stream (>1), or stop (0) IO
     IOREQUEST = 40 # Request one (1), a continuous stream (>1), or stop (0) IO SIPs
     BUMP_STALL = 44
     HOSTBAUD = 50
