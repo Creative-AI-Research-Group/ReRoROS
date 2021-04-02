@@ -169,7 +169,7 @@ class ArmGUI(tk.Frame):
 
     def key_release(self, event):
         key_released = event.keysym
-        if key_released == 'Shift':
+        if key_released == 'Shift_L':
             self.arm.pen_drawing_status = False
             self.arm.led_blue()
 
@@ -202,7 +202,7 @@ class ArmGUI(tk.Frame):
             self.terminate()
         if key_pressed == 'r':
             self.reset()
-        if key_pressed == 'Shift':
+        if key_pressed == 'Shift_L':
             self.arm.pen_drawing_status = True
             self.arm.led_red()
 
@@ -224,13 +224,13 @@ class ArmGUI(tk.Frame):
             self.arm.executeMove([event.x, event.y])
 
     def shift_press_on(self, event):
-        print(event)
+        print('hello shift', event)
         self.pen_offset = False
         if self.arm.draw_mode_status:
             self.arm.led_red()
 
     def shift_press_off(self, event):
-        print(event)
+        print('hello shift' ,event)
         self.pen_offset = True
         if self.arm.draw_mode_status:
             self.arm.led_blue()
@@ -249,7 +249,15 @@ class ArmGUI(tk.Frame):
         self.arm.move_joint_relative_speed(1, -5, 20)
 
     def arm_home(self):
+        # LED's ready for arm
         self.arm.led_green()
+
+        # take arm out of draw mode
+        self.arm.draw_mode_status = False
+        self.arm.first_draw_move = True
+        self.arm.pen_drawing_status = False
+
+        # go and wait
         self.arm.home()
 
     def pen_lift(self):
@@ -259,12 +267,22 @@ class ArmGUI(tk.Frame):
         self.arm.move_joint_relative_speed(4, 5, 20)
 
     def waiting_pos(self):
-        self.arm.wait_ready()
-        # LED's ready
+        # LED's ready for arm
         self.arm.led_green()
 
+        # wait in draw mode
+        self.arm.draw_mode_status = True
+        self.arm.first_draw_move = True
+        self.arm.pen_drawing_status = False
+
+        # go and wait
+        self.arm.wait_ready()
+
     def draw_ready_pos_draw(self):
-        self.arm.draw_ready()
+        # LED's ready fpr drawing
+        self.arm.led_blue()
+
+        # get arm into draw mode
         self.arm.draw_mode_status = True
         self.arm.first_draw_move = True
         self.arm.pen_drawing_status = False
@@ -272,8 +290,10 @@ class ArmGUI(tk.Frame):
         # put blue dot in centre of screen (draw ready pos)
         self.canvas.coords(self.cimg, 300, 450)
 
-        # LED's ready
-        self.arm.led_blue()
+        # goto position
+        self.arm.draw_ready()
+
+
 
     def open_claw(self):
         self.arm.move_joint_relative_speed(5, -140, 20)

@@ -303,11 +303,34 @@ class Arm:
                 lss4 = 1000 - 870
 
                 NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-                """
+                        x = params["baseradius"] + params["cbFrame"] + params["sqSize"] * sqNumber - params["sqSize"]*1/2
+                        y = params["sqSize"] * sqletter - copysign(params["sqSize"]*1/2,sqletter)
+                        {"baseradius": 1.77, "cbFrame": 0.62, "sqSize": 1.09, "cbHeight": 0.79, "pieceHeight": 1.97}
+        """
 
-        # todo accurate rescale
-        x = raw_xy[0] / 100
-        y = raw_xy[1] / 100
+        # params from canvas
+        x_old_min = 0
+        x_old_max = 750
+        y_old_min = 0
+        y_old_max = 900
+
+        # old calc in inches
+        baseradius = 1.77 # radius of LSS base to beginning of chess board
+        cbframe = 1 # outer frame of chess board
+        sqsize = 1.5 # cb square
+
+        # calc new range based on sqNumber -4 : +4; sqLetter 7 : 0
+        x_new_min = baseradius + cbframe + sqsize * -4
+        x_new_max = baseradius + cbframe * 4
+
+        y_new_min = sqsize * 8
+        y_new_max = sqsize * 1
+
+        # scaling using cb params vs 2D plot from canvas
+        # SWAP X & Y round to map on A4
+        y = (((raw_xy[0] - x_old_min) * (x_new_max - x_new_min)) / (x_old_max - x_old_min)) + x_new_min
+        x = (((raw_xy[1] - y_old_min) * (y_new_max - y_new_min)) / (y_old_max - y_old_min)) + y_new_min
+
         print('move = ', x, y)
         return [x, y]
 
@@ -315,17 +338,16 @@ class Arm:
     # Desired positions in x, y, z, gripper aperture
     def LSS_IK(self, targetXYZG):
         # UK centimeters
-        d1 = 10.49  # Bottom to shoulder
-        d2 = 14.25  # Shoulder to elbow
-        d3 = 16.23  # Elbow to wrist
-        d4 = 11.48  # Wrist to end of gripper
+        # d1 = 10.49  # Bottom to shoulder
+        # d2 = 14.25  # Shoulder to elbow
+        # d3 = 16.23  # Elbow to wrist
+        # d4 = 11.48  # Wrist to end of gripper
 
         # original US inches
-        # d1 = 4.13  # Bottom to shoulder
-        # d2 = 5.61  # Shoulder to elbow
-        # d3 = 6.39  # Elbow to wrist
-        # d4 = 4.52  # Wrist to end of gripper
-
+        d1 = 4.13  # Bottom to shoulder
+        d2 = 5.61  # Shoulder to elbow
+        d3 = 6.39  # Elbow to wrist
+        d4 = 4.52  # Wrist to end of gripper
 
         x0 = targetXYZG[0]
         y0 = targetXYZG[1]
@@ -339,8 +361,8 @@ class Arm:
         xyr = sqrt(x0 ** 2 + y0 ** 2)
         print('xyr = ', xyr)
 
-        # Pitch angle
-        q0 = 80
+        # Pitch angle for gripper head (was 80)
+        q0 = 90
 
         # Gripper components in xz plane
         lx = d4 * cos(q0 * pi / 180)
@@ -370,7 +392,7 @@ class Arm:
         q4 = q0 - (q3 - q2) + 5
 
         #  Add 15 deg because of the shoulder-elbow axis offset
-        q2 = q2 + 1 # 15
+        q2 = q2 + 15
 
         # Return values Base, Shoulder, Elbow, Wrist, Gripper
         angles_BSEWG = [q1, 90 - q2, q3 - 90, q4, g0]
@@ -467,19 +489,15 @@ class Arm:
 
     def executeMove(self, raw_xy):
         # some vars
-        gClose = -2
-        gOpen = -9.5
-        goDown = 0.6
-        gripState = gOpen
-        pen_offset = 1 # todo
+        pen_height = 3 # inch
 
         move = self.scale_xy(raw_xy)
 
         # set z for draw state (pen down or up)
         if self.pen_drawing_status:
-            z = pen_offset + 1
+            z = pen_height
         else:
-            z = pen_offset
+            z = pen_height + 2 # inch
 
         # move arm to ...
         x, y = move[0], move[1]
@@ -502,7 +520,7 @@ class Arm:
             self.elbow.setFilterPositionCount(15)
 
         #calc angles and move joints
-        angles_BSEWG = self.LSS_IK([x, y, z + pen_offset, 0])
+        angles_BSEWG = self.LSS_IK([x, y, z, 0])
 
         arrived = self.LSSA_moveMotors(angles_BSEWG)
         # self.askPermision(angles_BSEWG2, arrived2, issue2, homography, cap, selectedCam)
