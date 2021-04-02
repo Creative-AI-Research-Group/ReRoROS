@@ -43,8 +43,8 @@ class Arm:
 
         # Set standard positions - ABSOLUTES
         self.sleep_position_abs = [0, -900, 900, 0, 0]  # absolute arm position for hold
-        self.draw_ready_abs = [0, -350, 450, 0, 0]  # waits
-        self.draw_in_position = [0, -20, 100, 700, 0]
+        self.wait_ready_abs = [0, -350, 450, 0, 0]  # waits
+        self.draw_position_abs = [0, -20, 100, 700, 0]
 
         # Set standard positions - RELATIVE
         self.open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to receive pen
@@ -114,7 +114,7 @@ class Arm:
         # is this the 1st move?
         self.first_draw_move = True
 
-        # is the space bar down? (drawing not moving arm)
+        # is Shift down? (drawing not moving arm)
         self.pen_drawing_status = False
 
     #### lss shared commands ####
@@ -174,10 +174,15 @@ class Arm:
         joint.moveRelativeSpeed(delta, speed)
 
     #### drawing specific commands ####
+    # gets into waiting position
+    def wait_ready(self):
+        for i, joint in enumerate(self.lss_list):
+            joint.moveSpeed(self.wait_ready_abs[i], 30)
+
     # gets into drawing position
     def draw_ready(self):
         for i, joint in enumerate(self.lss_list):
-            joint.moveSpeed(self.draw_ready_abs[i], 50)
+            joint.moveSpeed(self.draw_position_abs[i], 30)
 
     # opens claw for pen
     def open_claw(self):
@@ -198,9 +203,9 @@ class Arm:
             joint.moveSpeed(self.sleep_position_abs[i], 50)
         self.hold()
 
-    def draw(self, x, y):
-        move = [x, y]
-        self.IK.executeMove(move)
+    # def draw(self, x, y):
+    #     move = [x, y]
+    #     self.IK.executeMove(move)
 
     # animation functions while waiting
     # todo
@@ -272,11 +277,13 @@ class Arm:
         # Destroy the bus
         lss.closeBus()
 
-### The follwing code is adapted from
-### https://github.com/Robotics-Technology/Chess-Robot/blob/master/ArmControl.py
-### sincere thanks to Geraldine BC at for allowing me to use her original code
-### as part of her Chess-Robot repo
-
+#########
+#
+# The following code is adapted from
+# https://github.com/Robotics-Technology/Chess-Robot/blob/master/ArmControl.py
+# sincere thanks to Geraldine BC for allowing me to use her original code
+#
+#########
 
     # checks if results are in range
     def checkConstraints(self, value, min, max):
@@ -287,7 +294,7 @@ class Arm:
         return value
 
     # calc rescale due to page size
-    def scale_xy(self, x, y):
+    def scale_xy(self, raw_xy):
         """x,y (top left = 0, 0) is opposite right corner of A4 page
                 lss1_x_min = 290 - 63
                 lss1_x_max = -73 - -420
@@ -298,19 +305,27 @@ class Arm:
                 NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
                 """
 
-        # todo accurate rescle
-        x /= 10
-        y /= 10
-        move = [x, y]
-        return move
+        # todo accurate rescale
+        x = raw_xy[0] / 100
+        y = raw_xy[1] / 100
+        print('move = ', x, y)
+        return [x, y]
 
     # calcs degrees for IK for each joint
     # Desired positions in x, y, z, gripper aperture
     def LSS_IK(self, targetXYZG):
-        d1 = 4.13  # Bottom to shoulder
-        d2 = 5.61  # Shoulder to elbow
-        d3 = 6.39  # Elbow to wrist
-        d4 = 4.52  # Wrist to end of gripper
+        # UK centimeters
+        d1 = 10.49  # Bottom to shoulder
+        d2 = 14.25  # Shoulder to elbow
+        d3 = 16.23  # Elbow to wrist
+        d4 = 11.48  # Wrist to end of gripper
+
+        # original US inches
+        # d1 = 4.13  # Bottom to shoulder
+        # d2 = 5.61  # Shoulder to elbow
+        # d3 = 6.39  # Elbow to wrist
+        # d4 = 4.52  # Wrist to end of gripper
+
 
         x0 = targetXYZG[0]
         y0 = targetXYZG[1]
@@ -322,6 +337,7 @@ class Arm:
 
         # Radius from the axis of rotation of the base in xy plane
         xyr = sqrt(x0 ** 2 + y0 ** 2)
+        print('xyr = ', xyr)
 
         # Pitch angle
         q0 = 80
@@ -336,8 +352,11 @@ class Arm:
 
         # Distance between the shoulder axis and the wrist axis
         h = sqrt(x1 ** 2 + z1 ** 2)
+        print('h = ', h)
 
         a1 = atan2(z1, x1)
+        print('a1 = ', a1)
+
         a2 = acos((d2 ** 2 - d3 ** 2 + h ** 2) / (2 * d2 * h))
 
         # Shoulder angle (degrees)
@@ -351,7 +370,7 @@ class Arm:
         q4 = q0 - (q3 - q2) + 5
 
         #  Add 15 deg because of the shoulder-elbow axis offset
-        q2 = q2 + 15
+        q2 = q2 + 1 # 15
 
         # Return values Base, Shoulder, Elbow, Wrist, Gripper
         angles_BSEWG = [q1, 90 - q2, q3 - 90, q4, g0]
@@ -446,18 +465,21 @@ class Arm:
         # change LED state to arm move
         self.allMotors.setColorLED(lssc.LSS_LED_Green)
 
-    def executeMove(self, move):
+    def executeMove(self, raw_xy):
         # some vars
         gClose = -2
         gOpen = -9.5
         goDown = 0.6
         gripState = gOpen
+        pen_offset = 1 # todo
+
+        move = self.scale_xy(raw_xy)
 
         # set z for draw state (pen down or up)
         if self.pen_drawing_status:
-            z = -10
+            z = pen_offset + 1
         else:
-            z = 0
+            z = pen_offset
 
         # move arm to ...
         x, y = move[0], move[1]
@@ -480,13 +502,13 @@ class Arm:
             self.elbow.setFilterPositionCount(15)
 
         #calc angles and move joints
-        angles_BSEWG = self.LSS_IK([x, y, z, 0])
+        angles_BSEWG = self.LSS_IK([x, y, z + pen_offset, 0])
 
         arrived = self.LSSA_moveMotors(angles_BSEWG)
         # self.askPermision(angles_BSEWG2, arrived2, issue2, homography, cap, selectedCam)
 
-        # make old x&y
-        x0, y0 = x, y
+        # # make old x&y
+        # x0, y0 = x, y
 
 if __name__ == "__main__":
     bot_arm = Arm()

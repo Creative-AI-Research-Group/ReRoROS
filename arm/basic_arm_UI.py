@@ -67,7 +67,7 @@ class ArmGUI(tk.Frame):
 
     def create_widgets(self):
         """create the interactive buttons"""
-        btn_quit = tk.Button(master=self, text="1:ready", command=self.draw_ready_pos, bg="red")
+        btn_quit = tk.Button(master=self, text="1:ready", command=self.waiting_pos, bg="red")
         btn_quit.grid(row=0, column=0, sticky="nsew")
 
         btn_up = tk.Button(master=self, text="2.open\nclaw", command=self.open_claw, bg="green")
@@ -82,7 +82,7 @@ class ArmGUI(tk.Frame):
         btn_down = tk.Button(master=self, text="a:left", command=self.draw_arm_left, bg="green")
         btn_down.grid(row=2, column=0, sticky="nsew")
 
-        btn_left = tk.Button(master=self, text="s:DRAW", command=self.draw_ready_pos, bg="green")
+        btn_left = tk.Button(master=self, text="s:DRAW", command=self.draw_ready_pos_draw, bg="green")
         btn_left.grid(row=2, column=1, sticky="nsew")
 
         btn_draw = tk.Button(master=self, text="d:right", command=self.draw_arm_right, bg="red")
@@ -110,51 +110,51 @@ class ArmGUI(tk.Frame):
         """joint_dict_pos = {'myLSS1': 0, 'myLSS2': 0, 'myLSS3': 0, 'myLSS4': 0, 'myLSS5': 0}"""
 
         # display joint positions
-        label_LSS1 = tk.Label(master=self, text=f"myLSS1 position = {self.arm.joint_dict['myLSS1']['pos']}")
+        label_LSS1 = tk.Label(master=self, text=f"myLSS1 position = {self.arm.joint_dict['base']['pos']}")
         label_LSS1.grid(row=0, column=3)
 
-        label_LSS2 = tk.Label(master=self, text=f"myLSS2 position = {self.arm.joint_dict['myLSS2']['pos']}")
+        label_LSS2 = tk.Label(master=self, text=f"myLSS2 position = {self.arm.joint_dict['shoulder']['pos']}")
         label_LSS2.grid(row=1, column=3)
 
-        label_LSS3 = tk.Label(master=self, text=f"myLSS3 position = {self.arm.joint_dict['myLSS3']['pos']}")
+        label_LSS3 = tk.Label(master=self, text=f"myLSS3 position = {self.arm.joint_dict['elbow']['pos']}")
         label_LSS3.grid(row=2, column=3)
 
-        label_LSS4 = tk.Label(master=self, text=f"myLSS4 position = {self.arm.joint_dict['myLSS4']['pos']}")
+        label_LSS4 = tk.Label(master=self, text=f"myLSS4 position = {self.arm.joint_dict['wrist']['pos']}")
         label_LSS4.grid(row=3, column=3)
 
-        label_LSS5 = tk.Label(master=self, text=f"myLSS5 position = {self.arm.joint_dict['myLSS5']['pos']}")
+        label_LSS5 = tk.Label(master=self, text=f"myLSS5 position = {self.arm.joint_dict['gripper']['pos']}")
         label_LSS5.grid(row=4, column=3)
 
         # display joint current/load
-        label_LSS1 = tk.Label(master=self, text=f"current = {self.arm.joint_dict['myLSS1']['load']}")
+        label_LSS1 = tk.Label(master=self, text=f"current = {self.arm.joint_dict['base']['load']}")
         label_LSS1.grid(row=0, column=4)
 
-        label_LSS2 = tk.Label(master=self, text=f"current = {self.arm.joint_dict['myLSS2']['load']}")
+        label_LSS2 = tk.Label(master=self, text=f"current = {self.arm.joint_dict['shoulder']['load']}")
         label_LSS2.grid(row=1, column=4)
 
-        label_LSS3 = tk.Label(master=self, text=f"current = {self.arm.joint_dict['myLSS3']['load']}")
+        label_LSS3 = tk.Label(master=self, text=f"current = {self.arm.joint_dict['elbow']['load']}")
         label_LSS3.grid(row=2, column=4)
 
-        label_LSS4 = tk.Label(master=self, text=f"current = {self.arm.joint_dict['myLSS4']['load']}")
+        label_LSS4 = tk.Label(master=self, text=f"current = {self.arm.joint_dict['wrist']['load']}")
         label_LSS4.grid(row=3, column=4)
 
-        label_LSS5 = tk.Label(master=self, text=f"current = {self.arm.joint_dict['myLSS5']['load']}")
+        label_LSS5 = tk.Label(master=self, text=f"current = {self.arm.joint_dict['gripper']['load']}")
         label_LSS5.grid(row=4, column=4)
 
         # display joint speed
-        label_LSS1 = tk.Label(master=self, text=f"speed = {self.arm.joint_dict['myLSS1']['speed']}")
+        label_LSS1 = tk.Label(master=self, text=f"speed = {self.arm.joint_dict['base']['speed']}")
         label_LSS1.grid(row=0, column=5)
 
-        label_LSS2 = tk.Label(master=self, text=f"speed = {self.arm.joint_dict['myLSS2']['speed']}")
+        label_LSS2 = tk.Label(master=self, text=f"speed = {self.arm.joint_dict['shoulder']['speed']}")
         label_LSS2.grid(row=1, column=5)
 
-        label_LSS3 = tk.Label(master=self, text=f"speed = {self.arm.joint_dict['myLSS3']['speed']}")
+        label_LSS3 = tk.Label(master=self, text=f"speed = {self.arm.joint_dict['elbow']['speed']}")
         label_LSS3.grid(row=2, column=5)
 
-        label_LSS4 = tk.Label(master=self, text=f"speed = {self.arm.joint_dict['myLSS4']['speed']}")
+        label_LSS4 = tk.Label(master=self, text=f"speed = {self.arm.joint_dict['wrist']['speed']}")
         label_LSS4.grid(row=3, column=5)
 
-        label_LSS5 = tk.Label(master=self, text=f"speed = {self.arm.joint_dict['myLSS5']['speed']}")
+        label_LSS5 = tk.Label(master=self, text=f"speed = {self.arm.joint_dict['gripper']['speed']}")
         label_LSS5.grid(row=4, column=5)
 
     def ui_updater(self):
@@ -179,7 +179,7 @@ class ArmGUI(tk.Frame):
         if self.logging:
             print(f'{key_pressed} pressed')
         if key_pressed == '1':
-            self.draw_ready_pos()
+            self.waiting_pos()
         if key_pressed == '2':
             self.open_claw()
         if key_pressed == '3':
@@ -189,11 +189,11 @@ class ArmGUI(tk.Frame):
         if key_pressed == 'a':
             self.draw_arm_left()
         if key_pressed == 's':
-            self.arm_home()
+            self.draw_ready_pos_draw()
         if key_pressed == 'd':
             self.draw_arm_right()
-        # if key_pressed == 'z':
-        #     self.draw_mode()
+        if key_pressed == 'h':
+            self.arm_home()
         if key_pressed == 'x':
             self.draw_arm_bkwd()
         # if key_pressed == 'c':
@@ -258,7 +258,12 @@ class ArmGUI(tk.Frame):
     def pen_down(self):
         self.arm.move_joint_relative_speed(4, 5, 20)
 
-    def draw_ready_pos(self):
+    def waiting_pos(self):
+        self.arm.wait_ready()
+        # LED's ready
+        self.arm.led_green()
+
+    def draw_ready_pos_draw(self):
         self.arm.draw_ready()
         self.arm.draw_mode_status = True
         self.arm.first_draw_move = True
