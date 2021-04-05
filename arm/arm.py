@@ -43,8 +43,8 @@ class Arm:
 
         # Set standard positions - ABSOLUTES
         self.sleep_position_abs = [0, -900, 900, 0, 0]  # absolute arm position for hold
-        self.wait_ready_abs = [0, -350, 450, 0, 0]  # waits
-        self.draw_position_abs = [0, -20, 100, 700, 0]
+        self.wait_ready_abs = [0, -900, 400, 600, 0]  # waits
+        self.draw_position_abs = [0, -90, 60, 840, 0]
 
         # Set standard positions - RELATIVE
         self.open_pen_rel = [0, 0, 0, 0, -140]  # opens claw to receive pen
@@ -58,16 +58,12 @@ class Arm:
         self.gripper = lss.LSS(5)
         self.allMotors = lss.LSS(254)
 
-        # Set stiffness (0= floppy joints which means less jitter at stop)
+        # Set stiffness (-4 : 4 = floppy joints which means less jitter at stop)
         self.allMotors.setAngularHoldingStiffness(0)
 
         # set max speed
-        self.allMotors.setMaxSpeed(50)
+        self.allMotors.setMaxSpeed(40)
         self.base.setMaxSpeed(40)
-
-        # allow spaming of positions to joint
-        self.shoulder.setMotionControlEnabled(0)
-        self.elbow.setMotionControlEnabled(0)
 
         # define joint list
         self.lss_list = [self.base,
@@ -76,11 +72,11 @@ class Arm:
                          self.wrist,
                          self.gripper]
 
-        self.lss_list_str = ['gripper',
-                             'wrist',
-                             'elbow',
+        self.lss_list_str = ['base',
                              'shoulder',
-                             'base']
+                             'elbow',
+                             'wrist',
+                             'gripper']
 
         # define joint dict for current position
         self.joint_dict = {'base': {'pos': 0, 'speed': 0, 'load': 0},
@@ -108,6 +104,9 @@ class Arm:
 
         # is Shift down? (drawing not moving arm)
         self.pen_drawing_status = False
+
+        # pen height from end of gripper
+        self.pen_height = 3  # inch
 
     #### lss shared commands ####
     # resets all joints
@@ -168,11 +167,19 @@ class Arm:
     #### drawing specific commands ####
     # gets into waiting position
     def wait_ready(self):
+        # allow spamming of positions to joint OFF
+        self.shoulder.setMotionControlEnabled(1)
+        self.elbow.setMotionControlEnabled(1)
+
         for i, joint in enumerate(self.lss_list):
             joint.moveSpeed(self.wait_ready_abs[i], 30)
 
     # gets into drawing position
     def draw_ready(self):
+        # allow spamming of positions to joint OFF
+        self.shoulder.setMotionControlEnabled(1)
+        self.elbow.setMotionControlEnabled(1)
+
         for i, joint in enumerate(self.lss_list):
             joint.moveSpeed(self.draw_position_abs[i], 30)
 
@@ -186,6 +193,10 @@ class Arm:
 
     # returns arm to home/ sleep position
     def home(self):
+        # allow spamming of positions to joint OFF
+        self.shoulder.setMotionControlEnabled(1)
+        self.elbow.setMotionControlEnabled(1)
+
         for i, joint in enumerate(self.lss_list):
             joint.moveSpeed(self.sleep_position_abs[i], 50)
 
@@ -235,7 +246,7 @@ class Arm:
             self.joint_dict[joint_dict]['load'] = load
 
     # calcs where next position of arm should be
-    # todo look at ar_motion solution for 'arrived'
+    # todo look at arm_motion solution for 'arrived'
     def is_in_position(self, position):
         pos_list = []
         pos_count = 0
@@ -308,7 +319,7 @@ class Arm:
         cbframe = 1 # outer frame of chess board
         sqsize = 1.5 # cb square
 
-        # calc new range based on sqNumber -4 : +4; sqLetter 7 : 0
+        # calc new range based on sqNumber -4 : +4; sqLetter 8 : 1
         x_new_min = baseradius + cbframe + sqsize * -4
         x_new_max = baseradius + cbframe * 4
 
@@ -378,10 +389,10 @@ class Arm:
         q3 = 180 - a3 * 180 / pi
 
         # Wrist angle (degrees) (add 5 deg because of the wrist-gripper offset)
-        q4 = q0 - (q3 - q2) + 5
+        q4 = q0 - (q3 - q2) + 6
 
         #  Add 15 deg because of the shoulder-elbow axis offset
-        q2 = q2 + 15
+        q2 = q2 + 16
 
         # Return values Base, Shoulder, Elbow, Wrist, Gripper
         angles_BSEWG = [q1, 90 - q2, q3 - 90, q4, g0]
@@ -396,11 +407,20 @@ class Arm:
     def LSSA_moveMotors(self, angles_BSEWG):
         # If the servos detect a current higher or equal than the value (mA)
         # before reaching the requested positions they will halt and hold
-        self.wrist.moveCH(angles_BSEWG[3], 1000)
-        self.shoulder.moveCH(angles_BSEWG[1], 1600)
-        self.elbow.moveCH(angles_BSEWG[2], 1600)
-        self.base.moveCH(angles_BSEWG[0], 1000)
-        self.gripper.moveCH(angles_BSEWG[4], 500)
+        # self.wrist.moveCH(angles_BSEWG[3], 1000)
+        # self.shoulder.moveCH(angles_BSEWG[1], 1600)
+        # self.elbow.moveCH(angles_BSEWG[2], 1600)
+        # self.base.moveCH(angles_BSEWG[0], 1000)
+        # self.gripper.moveCH(angles_BSEWG[4], 500)
+
+        # If the servos detect a current higher or equal than the value (mA)
+        # before reaching the requested positions they will halt and hold
+        # changed to moveSpeed to control Zen of interaction
+        self.wrist.moveSpeed(angles_BSEWG[3], 10)
+        self.shoulder.moveSpeed(angles_BSEWG[1], 10)
+        self.elbow.moveSpeed(angles_BSEWG[2], 10)
+        self.base.moveSpeed(angles_BSEWG[0], 10)
+        self.gripper.moveSpeed(angles_BSEWG[4], 10)
 
         arrived = False
         issue = 0
@@ -477,16 +497,18 @@ class Arm:
         self.allMotors.setColorLED(lssc.LSS_LED_Green)
 
     def executeMove(self, raw_xy):
-        # some vars
-        pen_height = 3 # inch
+
+        # allow spamming of positions to joint (drawing only)
+        self.shoulder.setMotionControlEnabled(0)
+        self.elbow.setMotionControlEnabled(0)
 
         move = self.scale_xy(raw_xy)
 
         # set z for draw state (pen down or up)
         if self.pen_drawing_status:
-            z = pen_height
+            z = self.pen_height
         else:
-            z = pen_height + 1 # inch
+            z = self.pen_height + 1 # inch
 
         # move arm to ...
         x, y = move[0], move[1]
