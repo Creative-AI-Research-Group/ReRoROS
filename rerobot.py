@@ -45,6 +45,7 @@ class Robot:
         # 4 - lift up
         # 5 - lift down
         # 6 - stop lift
+        # 15 - Halts both Gripper paddles and Lift
 
     def gripper_up(self):
         self.motor.cmd(self.motor.GRIPPER, value=4)
@@ -71,6 +72,9 @@ class Robot:
 
     def paddle_stop(self):
         self.motor.cmd(self.motor.GRIPPER, value=3)
+
+    def all_halt(self):
+        self.motor.cmd(self.motor.GRIPPER, value=15)
 
     # useful UI commands
     def step_forward(self):

@@ -40,6 +40,7 @@ class Motor(Comms):
                          self.HEADER1, self.HEADER2, self.SHORTCOUNT, self.SYNC0, 0, 0]
 
         # 3. initialises all the motor params
+        # fa fb 06 25 3b 02 00 27 3b = init gripper IO stop
         # A: #code 62, +, 1 (????not in manual … pulse off? No further pulses)
         # #code 4 = Enable robot's motors
         #
@@ -56,7 +57,8 @@ class Motor(Comms):
         # \xFA\xFB\x06\x0A\x3B\x64\x00\x6E\x3B\
         # xFA\xFB\x06\x17\x3B\x64\x00\x7B\x3B\
         # xFA\xFB\x06\x17\x1B\x64\x00\x7B\x1B"
-        motor_codes = [self.HEADER1, self.HEADER2, self.BYTECOUNT, 62, self.POSITIVE, 1, 0, 63, 59, # dont know code 62
+        motor_codes = [self.HEADER1, self.HEADER2, self.BYTECOUNT, self.GRIPPERIOREQUEST, self.POSITIVE, 0, 0, 37, 59, # new gripper insert
+                       self.HEADER1, self.HEADER2, self.BYTECOUNT, 62, self.POSITIVE, 1, 0, 63, 59, # dont know code 62
                        self.HEADER1, self.HEADER2, self.BYTECOUNT, self.ENABLE, self.POSITIVE, 1, 0, 5, 59], \
                       [self.HEADER1, self.HEADER2, self.BYTECOUNT, self.SETV, self.POSITIVE, 244, 1, 250, 60,
                        self.HEADER1, self.HEADER2, self.BYTECOUNT, self.SETA, self.POSITIVE, 44, 1, 49, 60,
