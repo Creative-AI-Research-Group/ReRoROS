@@ -4,7 +4,7 @@ and assigns relevent info to a variable.
 """
 
 import serial
-from time import sleep
+import sys
 
 class Comms:
     # Full codes and info:
@@ -82,7 +82,17 @@ class Comms:
         print(f'initialise connection to host\n'
               f'opens up the serial port as an object called "ser"{id}')
 
-        self.ser = serial.Serial(port='/dev/ttyUSB0',
+        if sys.platform.startswith('win'):
+            port = 'COM1'
+        elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+            # this excludes your current terminal "/dev/tty"
+            port = '/dev/ttyCOM1'
+        elif sys.platform.startswith('darwin'):
+            port = '/dev/cu.usbserial-144220'
+        else:
+            raise EnvironmentError('Unsupported platform')
+
+        self.ser = serial.Serial(port=port,
             baudrate=9600,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
