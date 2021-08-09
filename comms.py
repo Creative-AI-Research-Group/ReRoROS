@@ -88,7 +88,7 @@ class Comms:
             # this excludes your current terminal "/dev/tty"
             port = '/dev/ttyUSB0'
         elif sys.platform.startswith('darwin'):
-            port = '/dev/cu.usbserial-144220'
+            port = '/dev/cu.usbserial-FT5ADV3R'
         else:
             raise EnvironmentError('Unsupported platform')
 

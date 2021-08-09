@@ -48,15 +48,16 @@ class GUI(tk.Frame):
 
     def on_press(self, event):
         # self.log("button was pressed")
+        print(event)
         speed = self.speed_fdr.get()
         if event == "fwd":
-            self.robot.forward(speed)
+            self.robot.forward()
         elif event == "bkwd":
-            self.robot.backward(speed)
+            self.robot.backward()
         elif event == "right":
-            self.robot.right(speed/10)
+            self.robot.right()
         elif event == "left":
-            self.robot.left(speed/10)
+            self.robot.left()
 
     def on_release(self):
         # self.log("button was released")
@@ -83,29 +84,29 @@ class GUI(tk.Frame):
         btn_quit.grid(row=4, column=5, sticky="nsew")
 
         # added continuous movement buttons
-        self.speed_fdr = tk.Scale(self.gui, from_=0, to=50)
-        self.speed_fdr.set(10)
-        self.speed_fdr.grid(row=0, column=0, rowspan=5, columnspan=1, sticky="nsew")
-
-        btn_forward = tk.Button(master=self, text="forward", command=self.robot.step_forward, bg="green")
-        btn_forward.grid(row=0, column=3, sticky="nsew")
-        btn_forward.bind("<ButtonPress>", self.on_press("fwd"))
-        btn_forward.bind("<ButtonRelease>", self.on_release())
-
-        btn_backward = tk.Button(master=self, text="backward", command=self.robot.step_backward, bg="green")
-        btn_backward.grid(row=4, column=3, sticky="nsew")
-        btn_backward.bind("<ButtonPress>", self.on_press("bkwd"))
-        btn_backward.bind("<ButtonRelease>", self.on_release())
-
-        btn_rvel_left = tk.Button(master=self, text="left", command=self.robot.step_left, bg="green")
-        btn_rvel_left.grid(row=2, column=1, sticky="nsew")
-        btn_rvel_left.bind("<ButtonPress>", self.on_press("left"))
-        btn_rvel_left.bind("<ButtonRelease>", self.on_release())
-
-        btn_rvel_right = tk.Button(master=self, text="right", command=self.robot.step_right, bg="green")
-        btn_rvel_right.grid(row=2, column=5, sticky="nsew")
-        btn_rvel_right.bind("<ButtonPress>", self.on_press("right"))
-        btn_rvel_right.bind("<ButtonRelease>", self.on_release())
+        # self.speed_fdr = tk.Scale(self.gui, from_=0, to=50)
+        # self.speed_fdr.set(10)
+        # self.speed_fdr.grid(row=0, column=0, rowspan=5, columnspan=1, sticky="nsew")
+        #
+        # btn_forward = tk.Button(master=self, text="forward", command=self.robot.step_forward, bg="green")
+        # btn_forward.grid(row=0, column=3, sticky="nsew")
+        # btn_forward.bind("<ButtonPress>", self.on_press("fwd"))
+        # btn_forward.bind("<ButtonRelease>", self.on_release())
+        #
+        # btn_backward = tk.Button(master=self, text="backward", command=self.robot.step_backward, bg="green")
+        # btn_backward.grid(row=4, column=3, sticky="nsew")
+        # btn_backward.bind("<ButtonPress>", self.on_press("bkwd"))
+        # btn_backward.bind("<ButtonRelease>", self.on_release())
+        #
+        # btn_rvel_left = tk.Button(master=self, text="left", command=self.robot.step_left, bg="green")
+        # btn_rvel_left.grid(row=2, column=1, sticky="nsew")
+        # btn_rvel_left.bind("<ButtonPress>", self.on_press("left"))
+        # btn_rvel_left.bind("<ButtonRelease>", self.on_release())
+        #
+        # btn_rvel_right = tk.Button(master=self, text="right", command=self.robot.step_right, bg="green")
+        # btn_rvel_right.grid(row=2, column=5, sticky="nsew")
+        # btn_rvel_right.bind("<ButtonPress>", self.on_press("right"))
+        # btn_rvel_right.bind("<ButtonRelease>", self.on_release())
 
         # gripper control
         btn_gpr_up = tk.Button(master=self, text="gripper\nup", command=self.robot.gripper_up, bg="blue")
