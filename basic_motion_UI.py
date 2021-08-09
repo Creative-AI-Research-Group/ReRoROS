@@ -55,7 +55,7 @@ class GUI(tk.Frame):
             self.robot.backward(speed)
         elif event == "right":
             self.robot.right(speed/10)
-        elif event == 'left':
+        elif event == "left":
             self.robot.left(speed/10)
 
     def on_release(self):
