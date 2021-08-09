@@ -86,7 +86,7 @@ class Comms:
             port = 'COM1'
         elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
             # this excludes your current terminal "/dev/tty"
-            port = '/dev/ttyCOM0'
+            port = '/dev/ttyUSB0'
         elif sys.platform.startswith('darwin'):
             port = '/dev/cu.usbserial-144220'
         else:
