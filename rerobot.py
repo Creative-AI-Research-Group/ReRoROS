@@ -12,23 +12,23 @@ class Robot:
         self.motor = Motor()
 
     # ReRoBot specific commands (selection)
-    def nudge(self, dist=10.0):
+    def nudge(self, dist=10):
         """Translate (+) forward or (-) back mm distance at SETV speed"""
         self.motor.cmd(self.motor.MOVE, value=dist)
 
-    def move(self, speed=10.0):
+    def move(self, speed=10):
         """Move forward (+) or reverse (-) at millimeters per second"""
         self.motor.cmd(self.motor.VEL, value=speed)
 
-    def rvel(self, speed=10.0):
+    def rvel(self, speed=10):
         """Rotate robot at (+) counter- or (–) clockwise; degrees/sec (SETRV limit)."""
         self.motor.cmd(self.motor.RVEL, value=speed)
 
-    def head(self, degree=0.0):
+    def head(self, degree=0):
         """Turn at SETRV speed to absolute heading; ±degrees (+ = ccw )"""
         self.motor.cmd(self.motor.HEAD, value=degree)
 
-    def rotate(self, degrees=10.0):
+    def rotate(self, degrees=10):
         """Rotate (+) counter- or (-) clockwise degrees/sec."""
         self.motor.cmd(self.motor.ROTATE, value=degrees)
 
@@ -106,21 +106,21 @@ class Robot:
         self.motor.left(1)
         self.motor.right(1)
 
-    def forward(self, speed=10.0):
+    def forward(self, speed=10):
         self.move(speed)
 
-    def backward(self, speed=10.0):
+    def backward(self, speed=10):
         self.move(-speed)
 
     def stop(self):
         self.motor.stop()
 
-    def left(self, speed=1.0):
+    def left(self, speed=1):
         self.motor.left = -speed
         self.motor.right = speed
         self.move()
 
-    def right(self, speed=1.0):
+    def right(self, speed=1):
         self.motor.left = speed
         self.motor.right = -speed
         self.move()
