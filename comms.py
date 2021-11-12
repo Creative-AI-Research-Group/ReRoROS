@@ -5,6 +5,10 @@ and assigns relevent info to a variable.
 
 import serial
 import sys
+import atexit
+from threading import Thread
+from queue import Queue
+from time import sleep
 
 class Comms:
     # Full codes and info:
@@ -101,11 +105,34 @@ class Comms:
             )
         self.ser.isOpen()
 
+        # start a thread to wait for commands to write
+        self.incoming_commands_queue = Queue()
+
+        listeningThread = Thread(target=self.listening, args=(self.incoming_commands_queue,), daemon=True)
+        listeningThread.start()
+
+        atexit.register(self.close_sequence)
+
+    def listening(self, inputQueue):
+        while self.ser.isOpen():
+            if inputQueue.qsize() > 0:
+                input_str = inputQueue.get()
+                print("input_str = {}".format(input_str))
+
+                # write message to Toshiba
+                self.ser.write(input_str)
+
+            # pause to let other threads work
+            sleep(0.01)
+
     # writes to server
     def write(self, msg):
         msg_hx = bytearray(msg)
         print(f'sending hex message: {msg_hx} to {self.ser.port}')
-        self.ser.write(msg_hx)
+        # self.ser.write(msg_hx)
+
+        # put this into the Queue
+        self.incoming_commands_queue.put(msg_hx)
 
     # flush buffer
     def flush(self):
